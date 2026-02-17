@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { QRCodeCanvas } from "qrcode.react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCart } from "../redux/actions/cartActions";
@@ -6,6 +7,56 @@ import { checkout, clearOrderSuccess } from "../redux/actions/orderActions";
 import { logout } from "../redux/actions/authActions";
 import "../styles/pages/Landing.scss";
 import "../styles/pages/Checkout.scss";
+const logo = require("../assets/logo.png");
+
+const indianStates = [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
+    "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
+    "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+    "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
+    "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
+    "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh",
+    "Lakshadweep", "Puducherry"
+];
+
+const citiesByState = {
+    "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Kurnool", "Rajahmundry", "Tirupati"],
+    "Arunachal Pradesh": ["Itanagar", "Naharlagun"],
+    "Assam": ["Guwahati", "Silchar", "Dibrugarh", "Jorhat", "Nagaon", "Tinsukia"],
+    "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Darbhanga"],
+    "Chhattisgarh": ["Raipur", "Bhilai", "Bilaspur", "Korba", "Rajnandgaon"],
+    "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa"],
+    "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar", "Jamnagar", "Junagadh", "Gandhinagar"],
+    "Haryana": ["Faridabad", "Gurgaon", "Panipat", "Ambala", "Yamunanagar", "Rohtak", "Hisar", "Karnal", "Sonipat"],
+    "Himachal Pradesh": ["Shimla", "Dharamshala", "Manali", "Solan", "Mandi"],
+    "Jharkhand": ["Dhanbad", "Ranchi", "Jamshedpur", "Bokaro", "Hazaribagh", "Deoghar"],
+    "Karnataka": ["Bangalore", "Mysore", "Hubli-Dharwad", "Mangalore", "Belgaum", "Gulbarga", "Davangere", "Bellary"],
+    "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kannur", "Kollam"],
+    "Madhya Pradesh": ["Indore", "Bhopal", "Gwalior", "Jabalpur", "Ujjain", "Sagar", "Dewas", "Satna"],
+    "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad", "Solapur", "Navi Mumbai", "Amravati", "Jalgaon", "Akola", "Latur"],
+    "Manipur": ["Imphal"],
+    "Meghalaya": ["Shillong"],
+    "Mizoram": ["Aizawl"],
+    "Nagaland": ["Kohima", "Dimapur"],
+    "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur", "Sambalpur", "Puri"],
+    "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Mohali"],
+    "Rajasthan": ["Jaipur", "Jodhpur", "Kota", "Bikaner", "Ajmer", "Udaipur", "Bhilwara", "Alwar"],
+    "Sikkim": ["Gangtok"],
+    "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tiruppur", "Erode", "Vellore", "Tirunelveli", "Thoothukudi"],
+    "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Ramagundam", "Khammam"],
+    "Tripura": ["Agartala"],
+    "Uttar Pradesh": ["Lucknow", "Kanpur", "Ghaziabad", "Agra", "Meerut", "Varanasi", "Allahabad", "Noida", "Bareilly", "Aligarh", "Moradabad", "Saharanpur", "Gorakhpur"],
+    "Uttarakhand": ["Dehradun", "Haridwar", "Roorkee", "Haldwani", "Rishikesh"],
+    "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Asansol", "Siliguri", "Bardhaman"],
+    "Andaman and Nicobar Islands": ["Port Blair"],
+    "Chandigarh": ["Chandigarh"],
+    "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Diu", "Silvassa"],
+    "Delhi": ["Delhi", "New Delhi"],
+    "Jammu and Kashmir": ["Srinagar", "Jammu"],
+    "Ladakh": ["Leh", "Kargil"],
+    "Lakshadweep": ["Kavaratti"],
+    "Puducherry": ["Puducherry"]
+};
 
 const CheckoutPage = () => {
     const dispatch = useDispatch();
@@ -14,6 +65,7 @@ const CheckoutPage = () => {
     const { user } = useSelector((state) => state.auth);
     const { loading, error, orderSuccess } = useSelector((state) => state.orders);
 
+    const [paymentMethod, setPaymentMethod] = useState("online");
     const [form, setForm] = useState({
         name: user?.name || "",
         phone: "",
@@ -24,26 +76,80 @@ const CheckoutPage = () => {
     });
 
     useEffect(() => {
+        if (!loading && cartItems.length === 0 && !orderSuccess) {
+            navigate("/shop");
+        }
+    }, [cartItems, loading, navigate, orderSuccess]);
+
+    useEffect(() => {
         dispatch(fetchCart());
         return () => dispatch(clearOrderSuccess());
     }, [dispatch]);
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        if (name === "state") {
+            setForm({ ...form, state: value, city: "" });
+        } else {
+            setForm({ ...form, [name]: value });
+        }
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const fullAddress = `${form.address}, ${form.city}, ${form.state} ${form.zip}`;
-        const result = await dispatch(
-            checkout({
-                name: form.name,
-                phone: form.phone,
-                address: fullAddress,
-            })
-        );
-        if (result.success) {
-            // stays on page to show success modal
+
+        const processCheckout = async (paymentId = null) => {
+            const result = await dispatch(
+                checkout({
+                    name: form.name,
+                    phone: form.phone,
+                    address: fullAddress,
+                    paymentMethod,
+                    paymentId
+                })
+            );
+            if (result.success) {
+                // Success modal handles navigation
+            }
+        };
+
+        if (paymentMethod === "online") {
+            const options = {
+                key: process.env.REACT_APP_RAZORPAY_KEY || "rzp_test_1DP5mmOlF5G5ag", // Use env var or fallback
+                amount: total * 100, // Amount in paise
+                currency: "INR",
+                name: "ShopVerse",
+                description: "Purchase Payment",
+                image: logo,
+                handler: function (response) {
+                    processCheckout(response.razorpay_payment_id);
+                },
+                prefill: {
+                    name: form.name,
+                    email: user?.email || "guest@example.com",
+                    contact: form.phone
+                },
+                theme: {
+                    color: "#6c5ce7"
+                }
+            };
+
+            if (window.Razorpay) {
+                const rzp = new window.Razorpay(options);
+                rzp.open();
+            } else {
+                alert("Razorpay SDK failed to load. Please check your internet connection.");
+            }
+        } else if (paymentMethod === "qr") {
+            // Confirm manual payment
+            if (window.confirm("Have you successfully made the payment using the QR Code?")) {
+                processCheckout("UPI_QR_" + Date.now());
+            }
+        } else {
+            // Cash on Delivery
+            processCheckout();
         }
     };
 
@@ -57,6 +163,7 @@ const CheckoutPage = () => {
     const total = subtotal + shipping;
     const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : "U";
     const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const currentCities = citiesByState[form.state] || [];
 
     if (orderSuccess) {
         return (
@@ -168,26 +275,41 @@ const CheckoutPage = () => {
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>City</label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        placeholder="City"
-                                        value={form.city}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
                                     <label>State</label>
                                     <input
                                         type="text"
                                         name="state"
-                                        placeholder="State"
+                                        placeholder="Select State"
                                         value={form.state}
                                         onChange={handleChange}
                                         required
+                                        list="state-suggestions"
                                     />
+                                    <datalist id="state-suggestions">
+                                        {indianStates.map((state, index) => (
+                                            <option key={index} value={state} />
+                                        ))}
+                                    </datalist>
+                                </div>
+                                <div className="form-group">
+                                    <label>City</label>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        placeholder={currentCities.length > 0 ? "Select City" : "Select State first"}
+                                        value={form.city}
+                                        onChange={handleChange}
+                                        required
+                                        list="city-suggestions"
+                                        disabled={currentCities.length === 0}
+                                        title={currentCities.length === 0 ? "Please select a valid state first" : "Select your city"}
+                                        style={{ cursor: currentCities.length === 0 ? 'not-allowed' : 'text', opacity: currentCities.length === 0 ? 0.7 : 1 }}
+                                    />
+                                    <datalist id="city-suggestions">
+                                        {currentCities.map((city, index) => (
+                                            <option key={index} value={city} />
+                                        ))}
+                                    </datalist>
                                 </div>
                             </div>
 
@@ -201,6 +323,54 @@ const CheckoutPage = () => {
                                     onChange={handleChange}
                                     required
                                 />
+                            </div>
+                            <div className="form-group">
+                                <label>Payment Method</label>
+                                <div className="payment-options">
+                                    <div
+                                        className={`payment-card ${paymentMethod === "online" ? "active" : ""}`}
+                                        onClick={() => setPaymentMethod("online")}
+                                    >
+                                        <div className="radio-circle"></div>
+                                        <span>Credit/Debit Card (Razorpay)</span>
+                                    </div>
+                                    <div
+                                        className={`payment-card ${paymentMethod === "qr" ? "active" : ""}`}
+                                        onClick={() => setPaymentMethod("qr")}
+                                    >
+                                        <div className="radio-circle"></div>
+                                        <span>Scan & Pay (UPI)</span>
+                                    </div>
+                                    <div
+                                        className={`payment-card ${paymentMethod === "cod" ? "active" : ""}`}
+                                        onClick={() => setPaymentMethod("cod")}
+                                    >
+                                        <div className="radio-circle"></div>
+                                        <span>Cash on Delivery</span>
+                                    </div>
+                                </div>
+                                {paymentMethod === "qr" && (
+                                    <div className="qr-section" style={{
+                                        textAlign: 'center',
+                                        padding: '24px',
+                                        background: 'rgba(255, 255, 255, 0.05)',
+                                        borderRadius: '12px',
+                                        marginBottom: '24px',
+                                        border: '1px solid rgba(108, 92, 231, 0.3)'
+                                    }}>
+                                        <p style={{ marginBottom: '16px', color: '#a29bfe' }}>Scan to Pay ₹{total.toFixed(2)}</p>
+                                        <div style={{ background: 'white', padding: '16px', display: 'inline-block', borderRadius: '8px' }}>
+                                            <QRCodeCanvas
+                                                value={`upi://pay?pa=${process.env.REACT_APP_UPI_ID || "shopverse@upi"}&pn=ShopVerse&am=${total.toFixed(2)}&tn=Order%20Payment&cu=INR`}
+                                                size={180}
+                                                level={"H"}
+                                            />
+                                        </div>
+                                        <p style={{ marginTop: '16px', fontSize: '0.9rem', color: '#8888aa' }}>
+                                            After scanning and paying, click "Confirm Payment" below.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </form>
@@ -248,7 +418,11 @@ const CheckoutPage = () => {
                                 onClick={handleSubmit}
                                 disabled={loading || cartItems.length === 0}
                             >
-                                {loading ? "Processing..." : `Place Order — ₹${total.toFixed(2)}`}
+                                {loading ? "Processing..." : (
+                                    paymentMethod === "online" ? `Pay Now — ₹${total.toFixed(2)}` :
+                                        paymentMethod === "qr" ? `Confirm Payment — ₹${total.toFixed(2)}` :
+                                            `Place Order — ₹${total.toFixed(2)}`
+                                )}
                             </button>
                         </div>
                     </div>

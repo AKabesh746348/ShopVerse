@@ -61,6 +61,9 @@ def checkout():
                 "item_total": item_total,
             })
 
+    payment_method = data.get("paymentMethod", "cod")
+    payment_id = data.get("paymentId")
+
     order = {
         "user_id": user["user_id"],
         "items": order_items,
@@ -69,6 +72,11 @@ def checkout():
             "name": name,
             "address": address,
             "phone": phone,
+        },
+        "payment": {
+            "method": payment_method,
+            "transaction_id": payment_id,
+            "status": "paid" if payment_method == "online" else "pending"
         },
         "status": "confirmed",
         "created_at": datetime.datetime.utcnow(),
