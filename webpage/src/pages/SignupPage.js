@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signup, clearError } from "../redux/actions/authActions";
 import "../styles/pages/Auth.scss";
-const logo = require("../assets/logo.png");
 
 const SignupPage = () => {
     const [name, setName] = useState("");
@@ -57,7 +56,7 @@ const SignupPage = () => {
                 <div className="auth-card">
                     <div className="auth-header">
                         <div className="auth-logo">
-                            <img src={logo} alt="ShopVerse" className="logo-img" />
+                            <div className="logo-icon">🛍️</div>
                             <span>ShopVerse</span>
                         </div>
                         <h2>Create Account</h2>

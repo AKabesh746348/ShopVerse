@@ -5,7 +5,6 @@ import { fetchProducts, fetchCategories, setCategoryFilter, setSearchQuery } fro
 import { addToCart, fetchCart } from "../redux/actions/cartActions";
 import { logout } from "../redux/actions/authActions";
 import "../styles/pages/Landing.scss";
-const logo = require("../assets/logo.png");
 
 const LandingPage = () => {
     const dispatch = useDispatch();
@@ -56,9 +55,7 @@ const LandingPage = () => {
             {/* Navbar */}
             <nav className="landing-navbar">
                 <Link to="/shop" className="nav-brand">
-                    <div className="brand-icon">
-                        <img src={logo} alt="ShopVerse" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                    </div>
+                    <div className="brand-icon">🛍️</div>
                     <span>ShopVerse</span>
                 </Link>
 

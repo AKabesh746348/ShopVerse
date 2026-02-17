@@ -1,16 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "../styles/pages/Home.scss";
-const logo = require("../assets/logo.png");
 
 const HomePage = () => {
     return (
         <div className="home-page">
             <nav className="home-navbar">
                 <div className="brand">
-                    <div className="brand-icon">
-                        <img src={logo} alt="ShopVerse" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                    </div>
+                    <div className="brand-icon">🛍️</div>
                     <h1>ShopVerse</h1>
                 </div>
                 <div className="nav-links">

@@ -5,7 +5,6 @@ import { fetchCart, updateCartItem, removeFromCart } from "../redux/actions/cart
 import { logout } from "../redux/actions/authActions";
 import "../styles/pages/Landing.scss";
 import "../styles/pages/Cart.scss";
-const logo = require("../assets/logo.png");
 
 const CartPage = () => {
     const dispatch = useDispatch();
@@ -46,9 +45,7 @@ const CartPage = () => {
             {/* Navbar */}
             <nav className="landing-navbar">
                 <Link to="/shop" className="nav-brand">
-                    <div className="brand-icon">
-                        <img src={logo} alt="ShopVerse" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                    </div>
+                    <div className="brand-icon">🛍️</div>
                     <span>ShopVerse</span>
                 </Link>
 
