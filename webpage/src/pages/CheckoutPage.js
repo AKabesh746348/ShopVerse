@@ -6,6 +6,7 @@ import { checkout, clearOrderSuccess } from "../redux/actions/orderActions";
 import { logout } from "../redux/actions/authActions";
 import "../styles/pages/Landing.scss";
 import "../styles/pages/Checkout.scss";
+const logo = require("../assets/logo.png");
 
 const CheckoutPage = () => {
     const dispatch = useDispatch();
@@ -63,7 +64,9 @@ const CheckoutPage = () => {
             <div className="checkout-page">
                 <nav className="landing-navbar">
                     <Link to="/shop" className="nav-brand">
-                        <div className="brand-icon">🛍️</div>
+                        <div className="brand-icon">
+                            <img src={logo} alt="ShopVerse" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        </div>
                         <span>ShopVerse</span>
                     </Link>
                     <div className="nav-actions">
@@ -94,7 +97,9 @@ const CheckoutPage = () => {
             {/* Navbar */}
             <nav className="landing-navbar">
                 <Link to="/shop" className="nav-brand">
-                    <div className="brand-icon">🛍️</div>
+                    <div className="brand-icon">
+                        <img src={logo} alt="ShopVerse" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    </div>
                     <span>ShopVerse</span>
                 </Link>
                 <div className="nav-actions">
