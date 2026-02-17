@@ -1,0 +1,84 @@
+@use 'variables' as *;
+
+// ============================================
+// Global Styles
+// ============================================
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: $font-primary;
+    background: $dark-900;
+    color: $white;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+// Scrollbar
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: $dark-800;
+}
+
+::-webkit-scrollbar-thumb {
+    background: $dark-500;
+    border-radius: $radius-full;
+
+    &:hover {
+        background: $primary;
+    }
+}
+
+// Toast / Notification
+.toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    padding: $spacing-md $spacing-lg;
+    border-radius: $radius-md;
+    font-weight: 500;
+    z-index: 10000;
+    animation: slideInRight 0.3s ease, fadeIn 0.3s ease;
+    box-shadow: $shadow-lg;
+
+    &.toast-success {
+        background: linear-gradient(135deg, $success, darken($success, 10%));
+        color: $pure-white;
+    }
+
+    &.toast-error {
+        background: linear-gradient(135deg, $danger, darken($danger, 10%));
+        color: $pure-white;
+    }
+
+    &.toast-info {
+        background: linear-gradient(135deg, $info, darken($info, 10%));
+        color: $dark-900;
+    }
+}

@@ -1,0 +1,308 @@
+@use '../variables' as *;
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(108, 92, 231, 0.15) 0%, transparent 70%);
+        top: -200px;
+        right: -200px;
+        z-index: 0;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(253, 121, 168, 0.08) 0%, transparent 70%);
+        bottom: -150px;
+        left: -150px;
+        z-index: 0;
+    }
+}
+
+.auth-left {
+    flex: 1;
+    @include flex-center;
+    flex-direction: column;
+    padding: $spacing-3xl;
+    position: relative;
+    z-index: 10;
+
+    .auth-back-link {
+        position: absolute;
+        top: $spacing-xl;
+        left: $spacing-xl;
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        color: $gray-300;
+        font-size: 0.9rem;
+        transition: color $transition-base;
+        cursor: pointer;
+        text-decoration: none;
+
+        &:hover {
+            color: $primary-light;
+        }
+    }
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    animation: fadeIn 0.5s ease;
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: $spacing-xl;
+
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: $spacing-sm;
+            margin-bottom: $spacing-xl;
+
+            .logo-icon {
+                width: 44px;
+                height: 44px;
+                background: linear-gradient(135deg, $primary, $accent);
+                border-radius: $radius-md;
+                @include flex-center;
+                font-size: 1.4rem;
+            }
+
+            span {
+                font-family: $font-display;
+                font-size: 1.4rem;
+                font-weight: 700;
+                @include gradient-text;
+            }
+        }
+
+        h2 {
+            font-family: $font-display;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: $spacing-sm;
+        }
+
+        p {
+            color: $gray-300;
+            font-size: 0.95rem;
+        }
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-md;
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: $spacing-xs;
+
+            label {
+                font-size: 0.85rem;
+                font-weight: 500;
+                color: $gray-200;
+            }
+
+            .input-wrapper {
+                position: relative;
+
+                .input-icon {
+                    position: absolute;
+                    left: $spacing-md;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: $gray-300;
+                    font-size: 1.1rem;
+                }
+
+                input {
+                    @include input-field;
+                    padding-left: 44px;
+                }
+            }
+        }
+
+        .auth-error {
+            background: rgba(225, 112, 85, 0.1);
+            border: 1px solid rgba(225, 112, 85, 0.3);
+            border-radius: $radius-sm;
+            padding: $spacing-sm $spacing-md;
+            color: $danger;
+            font-size: 0.85rem;
+            animation: scaleIn 0.3s ease;
+        }
+
+        .btn-auth {
+            @include button-primary;
+            width: 100%;
+            padding: $spacing-md;
+            font-size: 1rem;
+            margin-top: $spacing-sm;
+
+            &.loading {
+                pointer-events: none;
+                opacity: 0.8;
+
+                .spinner {
+                    display: inline-block;
+                    width: 18px;
+                    height: 18px;
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    border-top-color: $pure-white;
+                    border-radius: 50%;
+                    animation: spin 0.6s linear infinite;
+                    margin-right: $spacing-sm;
+
+                    @keyframes spin {
+                        to {
+                            transform: rotate(360deg);
+                        }
+                    }
+                }
+            }
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: $spacing-md;
+            margin: $spacing-sm 0;
+
+            &::before,
+            &::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: $dark-500;
+            }
+
+            span {
+                color: $gray-300;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+        }
+
+        .auth-switch {
+            text-align: center;
+            color: $gray-300;
+            font-size: 0.9rem;
+
+            a {
+                color: $primary-light;
+                font-weight: 600;
+                transition: color $transition-base;
+
+                &:hover {
+                    color: $primary;
+                }
+            }
+        }
+    }
+}
+
+.auth-right {
+    flex: 1;
+    @include flex-center;
+    position: relative;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.05), rgba(253, 121, 168, 0.05));
+    overflow: hidden;
+
+    .auth-illustration {
+        text-align: center;
+        padding: $spacing-3xl;
+        animation: fadeIn 0.6s ease 0.3s both;
+        z-index: 10;
+
+        .illustration-graphic {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto $spacing-xl;
+            position: relative;
+
+            .circle-outer {
+                width: 100%;
+                height: 100%;
+                border: 2px solid rgba(108, 92, 231, 0.2);
+                border-radius: 50%;
+                @include flex-center;
+                animation: float 6s ease-in-out infinite;
+
+                .circle-inner {
+                    width: 200px;
+                    height: 200px;
+                    border: 2px solid rgba(253, 121, 168, 0.2);
+                    border-radius: 50%;
+                    @include flex-center;
+
+                    .center-icon {
+                        font-size: 4rem;
+                        animation: pulse 3s ease-in-out infinite;
+                    }
+                }
+            }
+
+            .floating-dot {
+                position: absolute;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                animation: float 4s ease-in-out infinite;
+
+                &:nth-child(2) {
+                    background: $primary;
+                    top: 20px;
+                    left: 60px;
+                    animation-delay: -1s;
+                }
+
+                &:nth-child(3) {
+                    background: $accent;
+                    top: 40px;
+                    right: 40px;
+                    animation-delay: -2s;
+                }
+
+                &:nth-child(4) {
+                    background: $secondary;
+                    bottom: 60px;
+                    left: 30px;
+                    animation-delay: -3s;
+                }
+            }
+        }
+
+        h3 {
+            font-family: $font-display;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: $spacing-sm;
+        }
+
+        p {
+            color: $gray-300;
+            max-width: 360px;
+            font-size: 0.95rem;
+        }
+    }
+
+    @include responsive($breakpoint-lg) {
+        display: none;
+    }
+}

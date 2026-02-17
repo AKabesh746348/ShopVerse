@@ -1,0 +1,312 @@
+@use '../variables' as *;
+
+// ============================================
+// Checkout Page
+// ============================================
+
+.checkout-page {
+    min-height: 100vh;
+    background: $dark-900;
+    padding-bottom: $spacing-3xl;
+}
+
+.checkout-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: $spacing-xl $spacing-2xl;
+    animation: fadeIn 0.4s ease;
+
+    .checkout-header {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        margin-bottom: $spacing-2xl;
+
+        .btn-back {
+            background: none;
+            border: 1px solid $dark-500;
+            color: $gray-300;
+            width: 40px;
+            height: 40px;
+            border-radius: $radius-sm;
+            @include flex-center;
+            cursor: pointer;
+            transition: all $transition-base;
+            font-size: 1.1rem;
+            text-decoration: none;
+
+            &:hover {
+                border-color: $primary;
+                color: $primary-light;
+            }
+        }
+
+        h2 {
+            font-family: $font-display;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+    }
+}
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: $spacing-xl;
+
+    @include responsive($breakpoint-lg) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Delivery Form
+.checkout-form {
+    animation: slideInLeft 0.4s ease;
+
+    .form-section {
+        @include glass-card;
+        padding: $spacing-xl;
+        margin-bottom: $spacing-lg;
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: $spacing-lg;
+            padding-bottom: $spacing-md;
+            border-bottom: 1px solid $dark-500;
+
+            .section-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: $radius-sm;
+                @include flex-center;
+                background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(108, 92, 231, 0.05));
+                font-size: 0.95rem;
+            }
+        }
+
+        .form-group {
+            margin-bottom: $spacing-md;
+
+            label {
+                display: block;
+                font-size: 0.85rem;
+                font-weight: 500;
+                color: $gray-200;
+                margin-bottom: $spacing-xs;
+            }
+
+            input,
+            textarea {
+                @include input-field;
+            }
+
+            textarea {
+                min-height: 100px;
+                resize: vertical;
+            }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: $spacing-md;
+
+            @include responsive($breakpoint-md) {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkout-error {
+            background: rgba(225, 112, 85, 0.1);
+            border: 1px solid rgba(225, 112, 85, 0.3);
+            border-radius: $radius-sm;
+            padding: $spacing-sm $spacing-md;
+            color: $danger;
+            font-size: 0.85rem;
+            margin-bottom: $spacing-md;
+            animation: scaleIn 0.3s ease;
+        }
+    }
+}
+
+// Order Summary Sidebar
+.checkout-summary {
+    animation: slideInRight 0.4s ease;
+
+    .summary-card {
+        @include glass-card;
+        padding: $spacing-xl;
+        position: sticky;
+        top: 100px;
+
+        h3 {
+            font-family: $font-display;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: $spacing-lg;
+        }
+
+        .summary-items {
+            display: flex;
+            flex-direction: column;
+            gap: $spacing-md;
+            margin-bottom: $spacing-lg;
+            padding-bottom: $spacing-lg;
+            border-bottom: 1px solid $dark-500;
+            max-height: 300px;
+            overflow-y: auto;
+
+            .summary-item {
+                display: flex;
+                align-items: center;
+                gap: $spacing-md;
+
+                .item-thumb {
+                    width: 48px;
+                    height: 48px;
+                    border-radius: $radius-sm;
+                    overflow: hidden;
+                    flex-shrink: 0;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                }
+
+                .item-details {
+                    flex: 1;
+                    min-width: 0;
+
+                    .item-name {
+                        font-size: 0.85rem;
+                        font-weight: 500;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .item-qty {
+                        color: $gray-300;
+                        font-size: 0.8rem;
+                    }
+                }
+
+                .item-price {
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    color: $primary-light;
+                }
+            }
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: $spacing-sm;
+            font-size: 0.9rem;
+
+            .label {
+                color: $gray-300;
+            }
+
+            &.total {
+                margin-top: $spacing-md;
+                padding-top: $spacing-md;
+                border-top: 1px solid $dark-500;
+                font-size: 1.15rem;
+
+                .label {
+                    color: $white;
+                    font-weight: 600;
+                }
+
+                .value {
+                    @include gradient-text;
+                    font-weight: 700;
+                }
+            }
+        }
+
+        .btn-place-order {
+            @include button-primary;
+            width: 100%;
+            padding: $spacing-md;
+            font-size: 1rem;
+            margin-top: $spacing-lg;
+
+            &.loading {
+                pointer-events: none;
+                opacity: 0.8;
+            }
+        }
+    }
+}
+
+// Order Success Modal
+.order-success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 15, 0.85);
+    @include flex-center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.order-success-modal {
+    @include glass-card;
+    padding: $spacing-2xl;
+    text-align: center;
+    max-width: 440px;
+    width: 90%;
+    animation: bounceIn 0.5s ease;
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto $spacing-lg;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(0, 184, 148, 0.2), rgba(0, 184, 148, 0.05));
+        @include flex-center;
+        font-size: 2.5rem;
+        animation: bounceIn 0.6s ease 0.2s both;
+    }
+
+    h3 {
+        font-family: $font-display;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: $spacing-sm;
+    }
+
+    p {
+        color: $gray-300;
+        margin-bottom: $spacing-sm;
+    }
+
+    .order-id {
+        background: $dark-700;
+        padding: $spacing-sm $spacing-md;
+        border-radius: $radius-sm;
+        font-family: monospace;
+        font-size: 0.85rem;
+        color: $primary-light;
+        margin-bottom: $spacing-xl;
+        display: inline-block;
+    }
+
+    .btn-back-shop {
+        @include button-primary;
+        padding: $spacing-md $spacing-2xl;
+        text-decoration: none;
+        display: inline-block;
+    }
+}
