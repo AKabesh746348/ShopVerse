@@ -9,6 +9,8 @@ const SignupPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [localError, setLocalError] = useState("");
 
     const dispatch = useDispatch();
@@ -95,11 +97,14 @@ const SignupPage = () => {
                             <div className="input-wrapper">
                                 <span className="input-icon">🔒</span>
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     placeholder="Create a password (min 6 chars)"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
+                                <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? "👁️" : "🙈"}
+                                </button>
                             </div>
                         </div>
 
@@ -108,11 +113,14 @@ const SignupPage = () => {
                             <div className="input-wrapper">
                                 <span className="input-icon">🔒</span>
                                 <input
-                                    type="password"
+                                    type={showConfirmPassword ? "text" : "password"}
                                     placeholder="Confirm your password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                 />
+                                <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                                    {showConfirmPassword ? "👁️" : "🙈"}
+                                </button>
                             </div>
                         </div>
 

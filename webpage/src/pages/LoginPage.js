@@ -7,6 +7,7 @@ import "../styles/pages/Auth.scss";
 const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [localError, setLocalError] = useState("");
 
     const dispatch = useDispatch();
@@ -70,11 +71,14 @@ const LoginPage = () => {
                             <div className="input-wrapper">
                                 <span className="input-icon">🔒</span>
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     placeholder="Enter your password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
+                                <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? "👁️" : "🙈"}
+                                </button>
                             </div>
                         </div>
 
