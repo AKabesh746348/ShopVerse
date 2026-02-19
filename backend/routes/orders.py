@@ -106,9 +106,20 @@ def checkout():
         {"$set": {"cart": []}}
     )
 
+    # Prepare order details for response
+    response_order = {
+        "order_id": str(result.inserted_id),
+        "created_at": order["created_at"].isoformat(),
+        "total": order["total"],
+        "items": order["items"],
+        "delivery": order["delivery"],
+        "payment": order["payment"]
+    }
+
     return jsonify({
         "message": "Order placed successfully!",
-        "order_id": str(result.inserted_id),
+        "order": response_order, 
+        "order_id": str(result.inserted_id), # Keep for backward compatibility if needed
         "total": round(total, 2),
     }), 201
 

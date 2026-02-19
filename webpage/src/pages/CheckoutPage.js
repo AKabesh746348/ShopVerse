@@ -211,9 +211,28 @@ const CheckoutPage = () => {
                         <p>Thank you for your purchase, {user?.name}!</p>
                         <div className="order-id">Order #{orderSuccess.order_id?.slice(-8)}</div>
                         <p>Total: <strong>₹{orderSuccess.total?.toFixed(2)}</strong></p>
-                        <Link to="/shop" className="btn-back-shop">
-                            Continue Shopping
-                        </Link>
+
+                        <div className="success-actions">
+                            <button className="btn-download-receipt" onClick={() => {
+                                const order = orderSuccess.order;
+                                if (!order) return;
+
+                                const receiptContent = `SHOPVERSE RECEIPT\n------------------\nOrder ID: ${order.order_id}\nDate: ${new Date(order.created_at).toLocaleString()}\n\nCustomer:\n${order.delivery.name}\n${order.delivery.phone}\n${order.delivery.address}\n\nItems:\n${order.items.map(item => `- ${item.name} x${item.quantity} = ₹${item.item_total}`).join('\n')}\n\n------------------\nTotal Amount: ₹${order.total}\nPayment Method: ${order.payment.method.toUpperCase()}\nStatus: ${order.payment.status.toUpperCase()}\n------------------\nThank you for shopping with ShopVerse!`;
+
+                                const blob = new Blob([receiptContent], { type: 'text/plain' });
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `ShopVerse_Receipt_${order.order_id.slice(-6)}.txt`;
+                                a.click();
+                                window.URL.revokeObjectURL(url);
+                            }}>
+                                📄 Download Receipt
+                            </button>
+                            <Link to="/shop" className="btn-back-shop">
+                                Continue Shopping
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
