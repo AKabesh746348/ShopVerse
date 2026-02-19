@@ -100,14 +100,16 @@ const CheckoutPage = () => {
         e.preventDefault();
         const fullAddress = `${form.address}, ${form.city}, ${form.state} ${form.zip}`;
 
-        const processCheckout = async (paymentId = null) => {
+        const processCheckout = async (paymentId = null, razorpayOrderId = null, razorpaySignature = null) => {
             const result = await dispatch(
                 checkout({
                     name: form.name,
                     phone: form.phone,
                     address: fullAddress,
                     paymentMethod,
-                    paymentId
+                    paymentId,
+                    razorpay_order_id: razorpayOrderId,
+                    razorpay_signature: razorpaySignature
                 })
             );
             if (result.success) {
@@ -116,36 +118,58 @@ const CheckoutPage = () => {
         };
 
         if (paymentMethod === "online") {
-            const options = {
-                key: process.env.REACT_APP_RAZORPAY_KEY || "rzp_test_1DP5mmOlF5G5ag", // Use env var or fallback
-                amount: total * 100, // Amount in paise
-                currency: "INR",
-                name: "ShopVerse",
-                description: "Purchase Payment",
-                image: logo,
-                handler: function (response) {
-                    processCheckout(response.razorpay_payment_id);
-                },
-                prefill: {
-                    name: form.name,
-                    email: user?.email || "guest@example.com",
-                    contact: form.phone
-                },
-                theme: {
-                    color: "#6c5ce7"
-                }
-            };
+            try {
+                // 1. Create Order on Server
+                const response = await fetch("http://localhost:5001/api/orders/razorpay-order", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token")}` // Assuming token is here
+                    }
+                });
 
-            if (window.Razorpay) {
-                const rzp = new window.Razorpay(options);
-                rzp.open();
-            } else {
-                alert("Razorpay SDK failed to load. Please check your internet connection.");
-            }
-        } else if (paymentMethod === "qr") {
-            // Confirm manual payment
-            if (window.confirm("Have you successfully made the payment using the QR Code?")) {
-                processCheckout("UPI_QR_" + Date.now());
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(errorData.error || "Failed to initiate payment");
+                    return;
+                }
+
+                const orderData = await response.json();
+
+                const options = {
+                    key: orderData.key,
+                    amount: orderData.amount,
+                    currency: orderData.currency,
+                    name: orderData.name,
+                    description: orderData.description,
+                    image: logo,
+                    order_id: orderData.order_id,
+                    handler: function (response) {
+                        // 2. Verify Payment on Server
+                        processCheckout(
+                            response.razorpay_payment_id,
+                            response.razorpay_order_id,
+                            response.razorpay_signature
+                        );
+                    },
+                    prefill: orderData.prefill,
+                    theme: {
+                        color: "#6c5ce7"
+                    }
+                };
+
+                if (window.Razorpay) {
+                    const rzp = new window.Razorpay(options);
+                    rzp.on('payment.failed', function (response) {
+                        alert("Payment Failed: " + response.error.description);
+                    });
+                    rzp.open();
+                } else {
+                    alert("Razorpay SDK failed to load. Please check your internet connection.");
+                }
+            } catch (err) {
+                console.error("Payment Error:", err);
+                alert("An error occurred while setting up payment.");
             }
         } else {
             // Cash on Delivery
@@ -332,14 +356,7 @@ const CheckoutPage = () => {
                                         onClick={() => setPaymentMethod("online")}
                                     >
                                         <div className="radio-circle"></div>
-                                        <span>Credit/Debit Card (Razorpay)</span>
-                                    </div>
-                                    <div
-                                        className={`payment-card ${paymentMethod === "qr" ? "active" : ""}`}
-                                        onClick={() => setPaymentMethod("qr")}
-                                    >
-                                        <div className="radio-circle"></div>
-                                        <span>Scan & Pay (UPI)</span>
+                                        <span>Online Payment (Razorpay)</span>
                                     </div>
                                     <div
                                         className={`payment-card ${paymentMethod === "cod" ? "active" : ""}`}
@@ -349,28 +366,6 @@ const CheckoutPage = () => {
                                         <span>Cash on Delivery</span>
                                     </div>
                                 </div>
-                                {paymentMethod === "qr" && (
-                                    <div className="qr-section" style={{
-                                        textAlign: 'center',
-                                        padding: '24px',
-                                        background: 'rgba(255, 255, 255, 0.05)',
-                                        borderRadius: '12px',
-                                        marginBottom: '24px',
-                                        border: '1px solid rgba(108, 92, 231, 0.3)'
-                                    }}>
-                                        <p style={{ marginBottom: '16px', color: '#a29bfe' }}>Scan to Pay ₹{total.toFixed(2)}</p>
-                                        <div style={{ background: 'white', padding: '16px', display: 'inline-block', borderRadius: '8px' }}>
-                                            <QRCodeCanvas
-                                                value={`upi://pay?pa=${process.env.REACT_APP_UPI_ID || "shopverse@upi"}&pn=ShopVerse&am=${total.toFixed(2)}&tn=Order%20Payment&cu=INR`}
-                                                size={180}
-                                                level={"H"}
-                                            />
-                                        </div>
-                                        <p style={{ marginTop: '16px', fontSize: '0.9rem', color: '#8888aa' }}>
-                                            After scanning and paying, click "Confirm Payment" below.
-                                        </p>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </form>
@@ -420,8 +415,7 @@ const CheckoutPage = () => {
                             >
                                 {loading ? "Processing..." : (
                                     paymentMethod === "online" ? `Pay Now — ₹${total.toFixed(2)}` :
-                                        paymentMethod === "qr" ? `Confirm Payment — ₹${total.toFixed(2)}` :
-                                            `Place Order — ₹${total.toFixed(2)}`
+                                        `Place Order — ₹${total.toFixed(2)}`
                                 )}
                             </button>
                         </div>

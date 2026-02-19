@@ -63,6 +63,21 @@ def checkout():
 
     payment_method = data.get("paymentMethod", "cod")
     payment_id = data.get("paymentId")
+    razorpay_order_id = data.get("razorpay_order_id")
+    razorpay_signature = data.get("razorpay_signature")
+
+    if payment_method == "online":
+        if not payment_id or not razorpay_order_id or not razorpay_signature:
+             return jsonify({"error": "Payment verification failed: Missing details"}), 400
+        
+        params_dict = {
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': razorpay_signature
+        }
+        
+        if not verify_razorpay_signature(params_dict):
+             return jsonify({"error": "Payment verification failed: Invalid signature"}), 400
 
     order = {
         "user_id": user["user_id"],
@@ -76,6 +91,7 @@ def checkout():
         "payment": {
             "method": payment_method,
             "transaction_id": payment_id,
+            "razorpay_order_id": razorpay_order_id,
             "status": "paid" if payment_method == "online" else "pending"
         },
         "status": "confirmed",
@@ -110,3 +126,80 @@ def get_orders():
         order["created_at"] = order["created_at"].isoformat()
 
     return jsonify({"orders": orders}), 200
+
+
+@orders_bp.route("/razorpay-order", methods=["POST"])
+def create_razorpay_order():
+    user = get_user_from_token()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        import razorpay
+        key_id = os.getenv("RAZORPAY_KEY_ID")
+        key_secret = os.getenv("RAZORPAY_KEY_SECRET")
+
+        print(f"DEBUG: Key ID present: {bool(key_id)}")
+        print(f"DEBUG: Key Secret present: {bool(key_secret)}")
+        
+        if not key_id or not key_secret:
+             print("Error: Razorpay keys are missing from environment variables.")
+             return jsonify({"error": "Server misconfiguration: Missing Payment Keys"}), 500
+
+        client = razorpay.Client(auth=(key_id, key_secret))
+
+        db = get_db()
+        user_doc = db.users.find_one({"_id": ObjectId(user["user_id"])})
+        cart = user_doc.get("cart", [])
+
+        if not cart:
+            return jsonify({"error": "Cart is empty"}), 400
+
+        total = 0
+        for item in cart:
+            product = db.products.find_one({"_id": ObjectId(item["product_id"])})
+            if product:
+                total += product["price"] * item["quantity"]
+
+        shipping = 0 if total > 100 else 9.99 # Logic should match frontend or be unified
+        final_amount = total + shipping
+        amount_in_paise = int(final_amount * 100)
+        
+        print(f"DEBUG: Creating order for amount: {amount_in_paise}")
+
+        # Shorten receipt to < 40 chars. 
+        # rcpt_ + last 6 of user_id + _ + timestamp 
+        receipt_id = f"rcpt_{str(user['user_id'])[-6:]}_{int(datetime.datetime.utcnow().timestamp())}"
+        data = { "amount": amount_in_paise, "currency": "INR", "receipt": receipt_id }
+        payment = client.order.create(data=data)
+
+        return jsonify({
+            "order_id": payment["id"],
+            "amount": payment["amount"],
+            "currency": payment["currency"],
+            "key": key_id,
+            "name": "ShopVerse",
+            "description": "Purchase Payment",
+             "prefill": {
+                "name": user.get("name", ""),
+                "email": user.get("email", ""),
+                "contact": user.get("phone", "") # Assuming phone is in user profile, otherwise empty
+            }
+        }), 200
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print(f"Razorpay Detailed Error: {str(e)}")
+        return jsonify({"error": f"Payment initialization failed: {str(e)}"}), 500
+
+
+def verify_razorpay_signature(params):
+    import razorpay
+    client = razorpay.Client(auth=(os.getenv("RAZORPAY_KEY_ID"), os.getenv("RAZORPAY_KEY_SECRET")))
+    try:
+        client.utility.verify_payment_signature(params)
+        return True
+    except Exception:
+        return False
+
