@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { QRCodeCanvas } from "qrcode.react";
+
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCart } from "../redux/actions/cartActions";
