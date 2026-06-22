@@ -11,81 +11,122 @@
 }
 
 .cart-content {
-    max-width: 1000px;
+    max-width: 1080px;
     margin: 0 auto;
     padding: $spacing-xl $spacing-2xl;
     animation: fadeIn 0.4s ease;
+}
 
-    .cart-header {
+// ── Header ────────────────────────────────────────────────
+.cart-header {
+    margin-bottom: $spacing-xl;
+
+    .cart-header-left {
         display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+    }
+
+    .btn-back-shop {
+        display: inline-flex;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: $spacing-xl;
+        gap: $spacing-xs;
+        font-size: 0.82rem;
+        color: $gray-300;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color $transition-fast;
 
-        h2 {
-            font-family: $font-display;
-            font-size: 1.8rem;
-            font-weight: 700;
+        &:hover { color: $primary-light; }
+    }
 
-            .cart-count {
-                color: $gray-300;
-                font-size: 1rem;
-                font-weight: 400;
-                margin-left: $spacing-sm;
-            }
-        }
+    h2 {
+        font-family: $font-display;
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: $pure-white;
 
-        .btn-continue {
-            @include button-secondary;
-            padding: $spacing-sm $spacing-lg;
-            font-size: 0.85rem;
-            text-decoration: none;
+        .cart-count-label {
+            color: $gray-300;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-left: $spacing-sm;
         }
     }
 }
 
-// Empty Cart
+// ── Loading ───────────────────────────────────────────────
+.cart-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-md;
+    padding: $spacing-3xl 0;
+    color: $gray-300;
+    font-size: 1rem;
+
+    .loading-spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid $dark-500;
+        border-top-color: $primary;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+}
+
+// ── Empty Cart ────────────────────────────────────────────
 .cart-empty {
-    @include flex-center;
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: $spacing-3xl;
+    text-align: center;
+    gap: $spacing-md;
     animation: fadeIn 0.4s ease;
 
     .empty-icon {
-        font-size: 5rem;
-        margin-bottom: $spacing-lg;
-        opacity: 0.4;
+        color: $gray-300;
+        opacity: 0.3;
         animation: float 4s ease-in-out infinite;
     }
 
     h3 {
         font-size: 1.4rem;
-        margin-bottom: $spacing-sm;
+        font-weight: 700;
+        color: $pure-white;
     }
 
     p {
         color: $gray-300;
-        margin-bottom: $spacing-xl;
+        max-width: 360px;
     }
 
-    .btn-shop {
-        @include button-primary;
+    .btn-start-shopping {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-sm;
+        margin-top: $spacing-sm;
+        @include button-accent;
         text-decoration: none;
+        padding: $spacing-sm $spacing-2xl;
     }
 }
 
-// Cart Layout
+// ── Cart Layout ───────────────────────────────────────────
 .cart-layout {
     display: grid;
-    grid-template-columns: 1fr 380px;
+    grid-template-columns: 1fr 360px;
     gap: $spacing-xl;
+    align-items: start;
 
     @include responsive($breakpoint-lg) {
         grid-template-columns: 1fr;
     }
 }
 
-// Cart Items
+// ── Cart Items ────────────────────────────────────────────
 .cart-items {
     display: flex;
     flex-direction: column;
@@ -93,24 +134,25 @@
 }
 
 .cart-item {
-    @include glass-card;
+    background: $dark-700;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: $radius-lg;
     display: flex;
     align-items: center;
     gap: $spacing-lg;
     padding: $spacing-md;
-    transition: all $transition-base;
-    animation: slideInLeft 0.4s ease;
+    transition: border-color $transition-base;
+    animation: slideInLeft 0.35s ease;
 
-    &:hover {
-        border-color: rgba(108, 92, 231, 0.3);
-    }
+    &:hover { border-color: rgba(99, 102, 241, 0.2); }
 
     .item-image {
-        width: 100px;
-        height: 100px;
+        width: 88px;
+        height: 88px;
         border-radius: $radius-md;
         overflow: hidden;
         flex-shrink: 0;
+        background: $dark-600;
 
         img {
             width: 100%;
@@ -121,17 +163,22 @@
 
     .item-info {
         flex: 1;
+        min-width: 0;
 
         .item-name {
             font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: $spacing-xs;
+            font-size: 0.95rem;
+            color: $white;
+            margin-bottom: 4px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
 
-        .item-price {
-            color: $primary-light;
-            font-weight: 600;
-            font-size: 0.95rem;
+        .item-unit-price {
+            color: $gray-300;
+            font-size: 0.8rem;
         }
     }
 
@@ -139,125 +186,147 @@
         display: flex;
         align-items: center;
         gap: $spacing-sm;
+        flex-shrink: 0;
 
-        button {
-            width: 32px;
-            height: 32px;
+        .qty-btn {
+            width: 30px;
+            height: 30px;
             @include flex-center;
             background: $dark-600;
-            border: 1px solid $dark-400;
+            border: 1px solid rgba(255,255,255,0.08);
             border-radius: $radius-sm;
-            color: $white;
+            color: $gray-100;
             cursor: pointer;
-            transition: all $transition-base;
-            font-size: 1rem;
+            transition: all $transition-fast;
 
             &:hover {
                 border-color: $primary;
-                background: rgba(108, 92, 231, 0.1);
+                background: rgba(99, 102, 241, 0.12);
+                color: $primary-light;
             }
         }
 
         .qty-value {
-            width: 36px;
+            min-width: 28px;
             text-align: center;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 0.95rem;
         }
     }
 
     .item-total {
-        font-weight: 700;
-        font-size: 1.1rem;
-        min-width: 80px;
+        font-weight: 800;
+        font-size: 1.05rem;
+        min-width: 75px;
         text-align: right;
         @include gradient-text;
+        flex-shrink: 0;
     }
 
     .item-remove {
+        width: 32px;
+        height: 32px;
+        @include flex-center;
         background: none;
         border: none;
         color: $gray-300;
         cursor: pointer;
-        padding: $spacing-sm;
-        font-size: 1.2rem;
-        transition: color $transition-base;
         border-radius: $radius-sm;
+        transition: all $transition-fast;
+        flex-shrink: 0;
 
         &:hover {
             color: $danger;
-            background: rgba(225, 112, 85, 0.1);
+            background: rgba(239, 68, 68, 0.08);
         }
     }
 
-    @include responsive($breakpoint-md) {
+    @include responsive($breakpoint-sm) {
         flex-wrap: wrap;
+        gap: $spacing-sm;
 
-        .item-image {
-            width: 80px;
-            height: 80px;
-        }
-
-        .item-total {
-            min-width: auto;
-        }
+        .item-image { width: 70px; height: 70px; }
+        .item-total { min-width: auto; }
     }
 }
 
-// Cart Summary
+// ── Cart Summary ──────────────────────────────────────────
 .cart-summary {
-    @include glass-card;
+    background: $dark-700;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: $radius-lg;
     padding: $spacing-xl;
-    height: fit-content;
     position: sticky;
-    top: 100px;
-    animation: slideInRight 0.4s ease;
+    top: 88px;
+    animation: slideInRight 0.35s ease;
 
     h3 {
         font-family: $font-display;
-        font-size: 1.2rem;
-        font-weight: 600;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: $pure-white;
         margin-bottom: $spacing-lg;
         padding-bottom: $spacing-md;
-        border-bottom: 1px solid $dark-500;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
-    .summary-row {
+    .summary-rows {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+        margin-bottom: $spacing-lg;
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            color: $gray-200;
+
+            .free { color: $success; font-weight: 600; }
+        }
+
+        .summary-note {
+            font-size: 0.78rem;
+            color: $accent;
+            background: rgba(245, 158, 11, 0.08);
+            border-radius: $radius-sm;
+            padding: 6px $spacing-sm;
+            text-align: center;
+        }
+    }
+
+    .summary-total {
         display: flex;
         justify-content: space-between;
-        margin-bottom: $spacing-md;
-        font-size: 0.95rem;
+        align-items: center;
+        padding: $spacing-md 0;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        margin-bottom: $spacing-lg;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: $pure-white;
 
-        .label {
-            color: $gray-300;
-        }
-
-        .value {
-            font-weight: 500;
-        }
-
-        &.total {
-            margin-top: $spacing-lg;
-            padding-top: $spacing-lg;
-            border-top: 1px solid $dark-500;
-            font-size: 1.2rem;
-
-            .label {
-                color: $white;
-                font-weight: 600;
-            }
-
-            .value {
-                @include gradient-text;
-                font-weight: 700;
-            }
-        }
+        span:last-child { @include gradient-text; font-size: 1.2rem; }
     }
 
     .btn-checkout {
-        @include button-primary;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-xs;
+        @include button-accent;
         width: 100%;
-        padding: $spacing-md;
-        font-size: 1rem;
-        margin-top: $spacing-lg;
+        padding: 14px;
+        font-size: 0.95rem;
+    }
+
+    .summary-trust {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-sm;
+        margin-top: $spacing-md;
+        font-size: 0.75rem;
+        color: $gray-300;
     }
 }

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCart } from "../redux/actions/cartActions";
 import { checkout, clearOrderSuccess } from "../redux/actions/orderActions";
 import { logout } from "../redux/actions/authActions";
+import {
+    ShoppingBagIcon, ShoppingCartIcon, LogOutIcon,
+    PackageIcon, ArrowLeftIcon, ArrowRightIcon, CheckCircleIcon, FileTextIcon, ShieldIcon
+} from "../components/Icons";
 import "../styles/pages/Landing.scss";
 import "../styles/pages/Checkout.scss";
 const logo = require("../assets/logo.png");
@@ -34,9 +37,7 @@ const citiesByState = {
     "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kannur", "Kollam"],
     "Madhya Pradesh": ["Indore", "Bhopal", "Gwalior", "Jabalpur", "Ujjain", "Sagar", "Dewas", "Satna"],
     "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad", "Solapur", "Navi Mumbai", "Amravati", "Jalgaon", "Akola", "Latur"],
-    "Manipur": ["Imphal"],
-    "Meghalaya": ["Shillong"],
-    "Mizoram": ["Aizawl"],
+    "Manipur": ["Imphal"], "Meghalaya": ["Shillong"], "Mizoram": ["Aizawl"],
     "Nagaland": ["Kohima", "Dimapur"],
     "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur", "Sambalpur", "Puri"],
     "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Mohali"],
@@ -48,14 +49,10 @@ const citiesByState = {
     "Uttar Pradesh": ["Lucknow", "Kanpur", "Ghaziabad", "Agra", "Meerut", "Varanasi", "Allahabad", "Noida", "Bareilly", "Aligarh", "Moradabad", "Saharanpur", "Gorakhpur"],
     "Uttarakhand": ["Dehradun", "Haridwar", "Roorkee", "Haldwani", "Rishikesh"],
     "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Asansol", "Siliguri", "Bardhaman"],
-    "Andaman and Nicobar Islands": ["Port Blair"],
-    "Chandigarh": ["Chandigarh"],
+    "Andaman and Nicobar Islands": ["Port Blair"], "Chandigarh": ["Chandigarh"],
     "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Diu", "Silvassa"],
-    "Delhi": ["Delhi", "New Delhi"],
-    "Jammu and Kashmir": ["Srinagar", "Jammu"],
-    "Ladakh": ["Leh", "Kargil"],
-    "Lakshadweep": ["Kavaratti"],
-    "Puducherry": ["Puducherry"]
+    "Delhi": ["Delhi", "New Delhi"], "Jammu and Kashmir": ["Srinagar", "Jammu"],
+    "Ladakh": ["Leh", "Kargil"], "Lakshadweep": ["Kavaratti"], "Puducherry": ["Puducherry"]
 };
 
 const CheckoutPage = () => {
@@ -67,18 +64,11 @@ const CheckoutPage = () => {
 
     const [paymentMethod, setPaymentMethod] = useState("online");
     const [form, setForm] = useState({
-        name: user?.name || "",
-        phone: "",
-        address: "",
-        city: "",
-        state: "",
-        zip: "",
+        name: user?.name || "", phone: "", address: "", city: "", state: "", zip: "",
     });
 
     useEffect(() => {
-        if (!loading && cartItems.length === 0 && !orderSuccess) {
-            navigate("/shop");
-        }
+        if (!loading && cartItems.length === 0 && !orderSuccess) navigate("/shop");
     }, [cartItems, loading, navigate, orderSuccess]);
 
     useEffect(() => {
@@ -88,102 +78,45 @@ const CheckoutPage = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name === "state") {
-            setForm({ ...form, state: value, city: "" });
-        } else {
-            setForm({ ...form, [name]: value });
-        }
+        setForm(name === "state" ? { ...form, state: value, city: "" } : { ...form, [name]: value });
     };
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const fullAddress = `${form.address}, ${form.city}, ${form.state} ${form.zip}`;
 
         const processCheckout = async (paymentId = null, razorpayOrderId = null, razorpaySignature = null) => {
-            const result = await dispatch(
-                checkout({
-                    name: form.name,
-                    phone: form.phone,
-                    address: fullAddress,
-                    paymentMethod,
-                    paymentId,
-                    razorpay_order_id: razorpayOrderId,
-                    razorpay_signature: razorpaySignature
-                })
-            );
-            if (result.success) {
-                // Success modal handles navigation
-            }
+            await dispatch(checkout({ name: form.name, phone: form.phone, address: fullAddress, paymentMethod, paymentId, razorpay_order_id: razorpayOrderId, razorpay_signature: razorpaySignature }));
         };
 
         if (paymentMethod === "online") {
             try {
-                // 1. Create Order on Server
                 const response = await fetch("http://localhost:5001/api/orders/razorpay-order", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token")}` // Assuming token is here
-                    }
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("token")}` }
                 });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    alert(errorData.error || "Failed to initiate payment");
-                    return;
-                }
-
+                if (!response.ok) { const e = await response.json(); alert(e.error || "Failed to initiate payment"); return; }
                 const orderData = await response.json();
-
                 const options = {
-                    key: orderData.key,
-                    amount: orderData.amount,
-                    currency: orderData.currency,
-                    name: orderData.name,
-                    description: orderData.description,
-                    image: logo,
+                    key: orderData.key, amount: orderData.amount, currency: orderData.currency,
+                    name: orderData.name, description: orderData.description, image: logo,
                     order_id: orderData.order_id,
-                    handler: function (response) {
-                        // 2. Verify Payment on Server
-                        processCheckout(
-                            response.razorpay_payment_id,
-                            response.razorpay_order_id,
-                            response.razorpay_signature
-                        );
-                    },
-                    prefill: orderData.prefill,
-                    theme: {
-                        color: "#6c5ce7"
-                    }
+                    handler: (r) => processCheckout(r.razorpay_payment_id, r.razorpay_order_id, r.razorpay_signature),
+                    prefill: orderData.prefill, theme: { color: "#6366f1" }
                 };
-
                 if (window.Razorpay) {
                     const rzp = new window.Razorpay(options);
-                    rzp.on('payment.failed', function (response) {
-                        alert("Payment Failed: " + response.error.description);
-                    });
+                    rzp.on("payment.failed", (r) => alert("Payment Failed: " + r.error.description));
                     rzp.open();
-                } else {
-                    alert("Razorpay SDK failed to load. Please check your internet connection.");
-                }
-            } catch (err) {
-                console.error("Payment Error:", err);
-                alert("An error occurred while setting up payment.");
-            }
-        } else {
-            // Cash on Delivery
-            processCheckout();
-        }
+                } else { alert("Razorpay SDK failed to load."); }
+            } catch (err) { console.error("Payment Error:", err); alert("An error occurred while setting up payment."); }
+        } else { processCheckout(); }
     };
 
-    const handleLogout = () => {
-        dispatch(logout());
-        navigate("/");
-    };
+    const handleLogout = () => { dispatch(logout()); navigate("/"); };
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const shipping = subtotal > 100 ? 0 : 9.99;
+    const shipping = subtotal > 999 ? 0 : 49;
     const total = subtotal + shipping;
     const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : "U";
     const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -194,43 +127,38 @@ const CheckoutPage = () => {
             <div className="checkout-page">
                 <nav className="landing-navbar">
                     <Link to="/shop" className="nav-brand">
-                        <div className="brand-icon">🛍️</div>
+                        <div className="brand-icon"><ShoppingBagIcon size={20} /></div>
                         <span>ShopVerse</span>
                     </Link>
                     <div className="nav-actions">
                         <div className="nav-user">
                             <div className="user-avatar">{userInitial}</div>
-                            <span className="user-name">{user?.name}</span>
+                            <div className="user-info"><span className="user-name">{user?.name}</span></div>
                         </div>
                     </div>
                 </nav>
                 <div className="order-success-overlay">
                     <div className="order-success-modal">
-                        <div className="success-icon">✅</div>
-                        <h3>Order Placed Successfully!</h3>
-                        <p>Thank you for your purchase, {user?.name}!</p>
-                        <div className="order-id">Order #{orderSuccess.order_id?.slice(-8)}</div>
-                        <p>Total: <strong>₹{orderSuccess.total?.toFixed(2)}</strong></p>
-
+                        <div className="success-icon"><CheckCircleIcon size={40} /></div>
+                        <h3>Order Placed!</h3>
+                        <p>Thank you, <strong>{user?.name}</strong>! Your order is confirmed.</p>
+                        <div className="order-id-badge">Order #{orderSuccess.order_id?.slice(-8).toUpperCase()}</div>
+                        <p className="order-total">Total: <strong>₹{orderSuccess.total?.toFixed(0)}</strong></p>
                         <div className="success-actions">
                             <button className="btn-download-receipt" onClick={() => {
                                 const order = orderSuccess.order;
                                 if (!order) return;
-
-                                const receiptContent = `SHOPVERSE RECEIPT\n------------------\nOrder ID: ${order.order_id}\nDate: ${new Date(order.created_at).toLocaleString()}\n\nCustomer:\n${order.delivery.name}\n${order.delivery.phone}\n${order.delivery.address}\n\nItems:\n${order.items.map(item => `- ${item.name} x${item.quantity} = ₹${item.item_total}`).join('\n')}\n\n------------------\nTotal Amount: ₹${order.total}\nPayment Method: ${order.payment.method.toUpperCase()}\nStatus: ${order.payment.status.toUpperCase()}\n------------------\nThank you for shopping with ShopVerse!`;
-
-                                const blob = new Blob([receiptContent], { type: 'text/plain' });
-                                const url = window.URL.createObjectURL(blob);
+                                const content = `SHOPVERSE RECEIPT\n------------------\nOrder ID: ${order.order_id}\nDate: ${new Date(order.created_at).toLocaleString()}\n\nCustomer:\n${order.delivery.name}\n${order.delivery.phone}\n${order.delivery.address}\n\nItems:\n${order.items.map(i => `- ${i.name} x${i.quantity} = ₹${i.item_total}`).join('\n')}\n\n------------------\nTotal: ₹${order.total}\nPayment: ${order.payment.method.toUpperCase()}\nStatus: ${order.payment.status.toUpperCase()}\n------------------\nThank you for shopping with ShopVerse!`;
+                                const blob = new Blob([content], { type: 'text/plain' });
+                                const url = URL.createObjectURL(blob);
                                 const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `ShopVerse_Receipt_${order.order_id.slice(-6)}.txt`;
-                                a.click();
-                                window.URL.revokeObjectURL(url);
+                                a.href = url; a.download = `ShopVerse_Receipt_${order.order_id.slice(-6)}.txt`; a.click();
+                                URL.revokeObjectURL(url);
                             }}>
-                                📄 Download Receipt
+                                <FileTextIcon size={16} /> Download Receipt
                             </button>
                             <Link to="/shop" className="btn-back-shop">
-                                Continue Shopping
+                                Continue Shopping <ArrowRightIcon size={16} />
                             </Link>
                         </div>
                     </div>
@@ -241,202 +169,157 @@ const CheckoutPage = () => {
 
     return (
         <div className="checkout-page">
-            {/* Navbar */}
             <nav className="landing-navbar">
                 <Link to="/shop" className="nav-brand">
-                    <div className="brand-icon">🛍️</div>
+                    <div className="brand-icon"><ShoppingBagIcon size={20} /></div>
                     <span>ShopVerse</span>
                 </Link>
                 <div className="nav-actions">
                     <div className="nav-user">
                         <div className="user-avatar">{userInitial}</div>
-                        <span className="user-name">{user?.name || "Guest"}</span>
+                        <div className="user-info">
+                            <span className="user-greeting">Hello,</span>
+                            <span className="user-name">{user?.name || "Guest"}</span>
+                        </div>
                     </div>
                     <Link to="/cart" className="nav-cart">
-                        <span className="cart-icon">🛒</span>
+                        <ShoppingCartIcon size={20} />
                         {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+                        <div className="cart-info">
+                            <span className="cart-label">Cart</span>
+                            <span className="cart-total">₹{total.toFixed(0)}</span>
+                        </div>
                     </Link>
-                    <button className="btn-logout" onClick={handleLogout}>
-                        Logout
+                    <button className="btn-logout" onClick={handleLogout} title="Logout">
+                        <LogOutIcon size={16} /><span>Logout</span>
                     </button>
                 </div>
             </nav>
 
             <div className="checkout-content">
                 <div className="checkout-header">
-                    <Link to="/cart" className="btn-back">
-                        ←
-                    </Link>
-                    <h2>Checkout</h2>
+                    <Link to="/cart" className="btn-back"><ArrowLeftIcon size={18} /></Link>
+                    <div className="checkout-breadcrumb">
+                        <span className="bc-done">Cart</span>
+                        <span className="bc-sep">›</span>
+                        <span className="bc-active">Details</span>
+                        <span className="bc-sep">›</span>
+                        <span className="bc-future">Payment</span>
+                    </div>
                 </div>
 
                 <div className="checkout-layout">
-                    {/* Delivery Form */}
                     <form className="checkout-form" onSubmit={handleSubmit}>
                         <div className="form-section">
                             <div className="section-title">
-                                <span className="section-icon">📦</span>
+                                <div className="section-icon"><PackageIcon size={16} /></div>
                                 Delivery Information
                             </div>
-
                             {error && <div className="checkout-error">{error}</div>}
 
-                            <div className="form-group">
-                                <label>Full Name</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Enter your full name"
-                                    value={form.name}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Phone Number</label>
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    placeholder="Enter your phone number"
-                                    value={form.phone}
-                                    onChange={handleChange}
-                                    required
-                                />
+                            <div className="form-grid-2">
+                                <div className="form-group">
+                                    <label>Full Name</label>
+                                    <input type="text" name="name" placeholder="Your full name" value={form.name} onChange={handleChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="tel" name="phone" placeholder="10-digit mobile number" value={form.phone} onChange={handleChange} required />
+                                </div>
                             </div>
 
                             <div className="form-group">
                                 <label>Street Address</label>
-                                <textarea
-                                    name="address"
-                                    placeholder="Enter your full address"
-                                    value={form.address}
-                                    onChange={handleChange}
-                                    required
-                                ></textarea>
+                                <textarea name="address" placeholder="House/flat no., street, locality" value={form.address} onChange={handleChange} required />
                             </div>
 
-                            <div className="form-row">
+                            <div className="form-grid-3">
                                 <div className="form-group">
                                     <label>State</label>
-                                    <input
-                                        type="text"
-                                        name="state"
-                                        placeholder="Select State"
-                                        value={form.state}
-                                        onChange={handleChange}
-                                        required
-                                        list="state-suggestions"
-                                    />
+                                    <input type="text" name="state" placeholder="Select state" value={form.state} onChange={handleChange} required list="state-suggestions" />
                                     <datalist id="state-suggestions">
-                                        {indianStates.map((state, index) => (
-                                            <option key={index} value={state} />
-                                        ))}
+                                        {indianStates.map((s, i) => <option key={i} value={s} />)}
                                     </datalist>
                                 </div>
                                 <div className="form-group">
                                     <label>City</label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        placeholder={currentCities.length > 0 ? "Select City" : "Select State first"}
-                                        value={form.city}
-                                        onChange={handleChange}
-                                        required
-                                        list="city-suggestions"
-                                        disabled={currentCities.length === 0}
-                                        title={currentCities.length === 0 ? "Please select a valid state first" : "Select your city"}
-                                        style={{ cursor: currentCities.length === 0 ? 'not-allowed' : 'text', opacity: currentCities.length === 0 ? 0.7 : 1 }}
-                                    />
+                                    <input type="text" name="city" placeholder={currentCities.length > 0 ? "Select city" : "Choose state first"} value={form.city} onChange={handleChange} required list="city-suggestions" disabled={currentCities.length === 0} />
                                     <datalist id="city-suggestions">
-                                        {currentCities.map((city, index) => (
-                                            <option key={index} value={city} />
-                                        ))}
+                                        {currentCities.map((c, i) => <option key={i} value={c} />)}
                                     </datalist>
                                 </div>
+                                <div className="form-group">
+                                    <label>PIN Code</label>
+                                    <input type="text" name="zip" placeholder="6-digit PIN" value={form.zip} onChange={handleChange} required />
+                                </div>
                             </div>
+                        </div>
 
-                            <div className="form-group">
-                                <label>ZIP Code</label>
-                                <input
-                                    type="text"
-                                    name="zip"
-                                    placeholder="ZIP Code"
-                                    value={form.zip}
-                                    onChange={handleChange}
-                                    required
-                                />
+                        <div className="form-section">
+                            <div className="section-title">
+                                <div className="section-icon"><ShieldIcon size={16} /></div>
+                                Payment Method
                             </div>
-                            <div className="form-group">
-                                <label>Payment Method</label>
-                                <div className="payment-options">
-                                    <div
-                                        className={`payment-card ${paymentMethod === "online" ? "active" : ""}`}
-                                        onClick={() => setPaymentMethod("online")}
-                                    >
-                                        <div className="radio-circle"></div>
-                                        <span>Online Payment (Razorpay)</span>
+                            <div className="payment-options">
+                                <div className={`payment-card ${paymentMethod === "online" ? "active" : ""}`} onClick={() => setPaymentMethod("online")}>
+                                    <div className="radio-dot" />
+                                    <div className="payment-card-content">
+                                        <span className="payment-card-title">Online Payment</span>
+                                        <span className="payment-card-sub">UPI, Cards, Net Banking via Razorpay</span>
                                     </div>
-                                    <div
-                                        className={`payment-card ${paymentMethod === "cod" ? "active" : ""}`}
-                                        onClick={() => setPaymentMethod("cod")}
-                                    >
-                                        <div className="radio-circle"></div>
-                                        <span>Cash on Delivery</span>
+                                </div>
+                                <div className={`payment-card ${paymentMethod === "cod" ? "active" : ""}`} onClick={() => setPaymentMethod("cod")}>
+                                    <div className="radio-dot" />
+                                    <div className="payment-card-content">
+                                        <span className="payment-card-title">Cash on Delivery</span>
+                                        <span className="payment-card-sub">Pay when your order arrives</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </form>
 
-                    {/* Order Summary */}
                     <div className="checkout-summary">
                         <div className="summary-card">
                             <h3>Order Summary</h3>
-
                             <div className="summary-items">
                                 {cartItems.map((item) => (
                                     <div key={item.product_id} className="summary-item">
                                         <div className="item-thumb">
                                             <img src={item.image} alt={item.name} />
+                                            <span className="item-qty-badge">{item.quantity}</span>
                                         </div>
                                         <div className="item-details">
                                             <div className="item-name">{item.name}</div>
-                                            <div className="item-qty">Qty: {item.quantity}</div>
                                         </div>
-                                        <span className="item-price">
-                                            ₹{(item.price * item.quantity).toFixed(2)}
-                                        </span>
+                                        <span className="item-price">₹{(item.price * item.quantity).toFixed(0)}</span>
                                     </div>
                                 ))}
                             </div>
-
-                            <div className="summary-row">
-                                <span className="label">Subtotal</span>
-                                <span className="value">₹{subtotal.toFixed(2)}</span>
+                            <div className="summary-rows">
+                                <div className="summary-row">
+                                    <span>Subtotal</span><span>₹{subtotal.toFixed(0)}</span>
+                                </div>
+                                <div className="summary-row">
+                                    <span>Shipping</span>
+                                    <span className={shipping === 0 ? "free" : ""}>{shipping === 0 ? "Free" : `₹${shipping}`}</span>
+                                </div>
                             </div>
-                            <div className="summary-row">
-                                <span className="label">Shipping</span>
-                                <span className="value">
-                                    {shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}
-                                </span>
+                            <div className="summary-total">
+                                <span>Total</span><span>₹{total.toFixed(0)}</span>
                             </div>
-                            <div className="summary-row total">
-                                <span className="label">Total</span>
-                                <span className="value">₹{total.toFixed(2)}</span>
-                            </div>
-
-                            <button
-                                type="button"
-                                className={`btn-place-order ${loading ? "loading" : ""}`}
-                                onClick={handleSubmit}
-                                disabled={loading || cartItems.length === 0}
-                            >
-                                {loading ? "Processing..." : (
-                                    paymentMethod === "online" ? `Pay Now — ₹${total.toFixed(2)}` :
-                                        `Place Order — ₹${total.toFixed(2)}`
+                            <button type="button" className={`btn-place-order ${loading ? "loading" : ""}`} onClick={handleSubmit} disabled={loading || cartItems.length === 0}>
+                                {loading ? (
+                                    <><span className="spinner" /> Processing...</>
+                                ) : paymentMethod === "online" ? (
+                                    <>Pay ₹{total.toFixed(0)} <ArrowRightIcon size={16} /></>
+                                ) : (
+                                    <>Place Order <ArrowRightIcon size={16} /></>
                                 )}
                             </button>
+                            <div className="summary-secure">
+                                <ShieldIcon size={13} /> Secured by 256-bit SSL encryption
+                            </div>
                         </div>
                     </div>
                 </div>

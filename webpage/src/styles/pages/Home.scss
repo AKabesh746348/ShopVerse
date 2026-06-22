@@ -4,64 +4,91 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    position: relative;
-    overflow: hidden;
+    background: $dark-900;
+    overflow-x: hidden;
+}
 
-    // Background orbs
-    &::before,
-    &::after {
-        content: '';
-        position: absolute;
+// ── Announcement Bar ──────────────────────────────────────
+.home-announcement {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-sm;
+    padding: 10px $spacing-lg;
+    background: linear-gradient(90deg, $primary-dark, $primary, $primary-dark);
+    background-size: 200% 100%;
+    animation: gradientMove 6s ease infinite;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+
+    .announcement-dot {
+        width: 6px;
+        height: 6px;
+        background: $accent;
         border-radius: 50%;
-        filter: blur(120px);
-        z-index: 0;
-        animation: float 8s ease-in-out infinite;
+        animation: pulse 2s ease-in-out infinite;
     }
 
-    &::before {
-        width: 500px;
-        height: 500px;
-        background: rgba(108, 92, 231, 0.15);
-        top: -100px;
-        right: -100px;
+    strong { color: $accent-light; }
+
+    .announcement-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: $spacing-sm;
+        padding: 3px $spacing-sm;
+        background: rgba(255,255,255,0.15);
+        border-radius: $radius-full;
+        color: $pure-white;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background $transition-fast;
+
+        &:hover { background: rgba(255,255,255,0.25); }
     }
 
-    &::after {
-        width: 400px;
-        height: 400px;
-        background: rgba(253, 121, 168, 0.1);
-        bottom: -100px;
-        left: -100px;
-        animation-delay: -4s;
+    @include responsive($breakpoint-sm) {
+        font-size: 0.75rem;
+        text-align: center;
+        flex-wrap: wrap;
+        gap: 4px;
     }
 }
 
+// ── Navbar ────────────────────────────────────────────────
 .home-navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: $spacing-lg $spacing-3xl;
-    position: relative;
-    z-index: 10;
-    animation: fadeIn 0.6s ease;
+    padding: $spacing-md $spacing-3xl;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8, 8, 15, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    animation: fadeInFast 0.4s ease;
 
     .brand {
         display: flex;
         align-items: center;
-        gap: $spacing-md;
+        gap: $spacing-sm;
 
         .brand-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, $primary, $accent);
-            border-radius: $radius-md;
+            width: 40px;
+            height: 40px;
+            background: $primary;
+            border-radius: $radius-sm;
             @include flex-center;
-            font-size: 1.4rem;
+            color: $pure-white;
         }
 
         h1 {
             font-family: $font-display;
-            font-size: 1.6rem;
+            font-size: 1.45rem;
             font-weight: 700;
             @include gradient-text;
         }
@@ -69,47 +96,74 @@
 
     .nav-links {
         display: flex;
+        align-items: center;
         gap: $spacing-md;
 
         .btn-login {
-            @include button-secondary;
+            @include button-ghost;
             padding: $spacing-sm $spacing-lg;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-signup {
-            @include button-primary;
+            @include button-accent;
             padding: $spacing-sm $spacing-lg;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: $spacing-xs;
         }
+    }
+
+    @include responsive($breakpoint-sm) {
+        padding: $spacing-md $spacing-lg;
+
+        .nav-links .btn-login { display: none; }
+        .btn-signup { padding: $spacing-xs $spacing-md !important; font-size: 0.82rem !important; }
     }
 }
 
+// ── Hero ──────────────────────────────────────────────────
 .home-hero {
-    flex: 1;
-    @include flex-center;
-    flex-direction: column;
-    text-align: center;
-    padding: $spacing-3xl;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: $spacing-3xl;
+    padding: $spacing-3xl $spacing-3xl;
+    min-height: 85vh;
     position: relative;
-    z-index: 10;
+
+    @include responsive($breakpoint-lg) {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding: $spacing-2xl $spacing-xl;
+        text-align: center;
+    }
+}
+
+.hero-content {
+    z-index: 2;
+    animation: slideInLeft 0.7s ease both;
 
     .hero-badge {
         display: inline-flex;
         align-items: center;
         gap: $spacing-sm;
-        padding: $spacing-sm $spacing-lg;
-        background: rgba(108, 92, 231, 0.15);
-        border: 1px solid rgba(108, 92, 231, 0.3);
+        padding: 6px $spacing-md;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.25);
         border-radius: $radius-full;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         color: $primary-light;
+        font-weight: 500;
         margin-bottom: $spacing-xl;
-        animation: fadeIn 0.6s ease 0.2s both;
 
         .badge-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: $success;
             animation: pulse 2s ease-in-out infinite;
@@ -118,110 +172,625 @@
 
     h2 {
         font-family: $font-display;
-        font-size: clamp(2.5rem, 6vw, 4.5rem);
+        font-size: clamp(2.4rem, 5vw, 4rem);
         font-weight: 800;
         line-height: 1.1;
         margin-bottom: $spacing-lg;
-        animation: fadeIn 0.6s ease 0.4s both;
+        color: $pure-white;
 
-        .gradient-text {
-            @include gradient-text;
-        }
+        .gradient-text { @include gradient-text; }
     }
 
     .hero-subtitle {
-        font-size: 1.2rem;
+        font-size: 1.05rem;
         color: $gray-200;
-        max-width: 600px;
+        max-width: 480px;
         margin-bottom: $spacing-2xl;
-        animation: fadeIn 0.6s ease 0.6s both;
+        line-height: 1.7;
+
+        @include responsive($breakpoint-lg) {
+            margin: 0 auto $spacing-2xl;
+        }
     }
 
     .hero-actions {
         display: flex;
         gap: $spacing-md;
-        animation: fadeIn 0.6s ease 0.8s both;
+        flex-wrap: wrap;
+        margin-bottom: $spacing-2xl;
 
-        .btn-get-started {
-            @include button-primary;
-            padding: $spacing-md $spacing-2xl;
-            font-size: 1.1rem;
+        @include responsive($breakpoint-lg) {
+            justify-content: center;
+        }
 
-            .arrow {
-                display: inline-block;
-                margin-left: $spacing-sm;
-                transition: transform $transition-base;
-            }
+        .btn-hero-primary {
+            @include button-accent;
+            padding: 14px $spacing-2xl;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: $spacing-sm;
+        }
 
-            &:hover .arrow {
-                transform: translateX(6px);
+        .btn-hero-ghost {
+            @include button-ghost;
+            padding: 14px $spacing-xl;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+    }
+
+    .hero-trust {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        color: $gray-200;
+        font-size: 0.88rem;
+
+        @include responsive($breakpoint-lg) {
+            justify-content: center;
+        }
+
+        .trust-avatars {
+            display: flex;
+
+            .trust-avatar {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, $primary, $primary-dark);
+                @include flex-center;
+                font-size: 0.7rem;
+                font-weight: 700;
+                color: $pure-white;
+                border: 2px solid $dark-900;
+                margin-left: -8px;
+
+                &:first-child { margin-left: 0; }
             }
         }
 
-        .btn-explore {
-            @include button-secondary;
-            padding: $spacing-md $spacing-2xl;
-            font-size: 1.1rem;
+        strong { color: $pure-white; }
+    }
+}
+
+.hero-visual {
+    position: relative;
+    height: 480px;
+    z-index: 2;
+    animation: slideInRight 0.7s ease 0.15s both;
+
+    @include responsive($breakpoint-lg) { display: none; }
+
+    .hero-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+
+        &--1 {
+            width: 320px;
+            height: 320px;
+            background: rgba(99, 102, 241, 0.2);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        &--2 {
+            width: 200px;
+            height: 200px;
+            background: rgba(245, 158, 11, 0.12);
+            bottom: 40px;
+            right: 0;
         }
     }
 }
 
-.home-features {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: $spacing-lg;
-    padding: $spacing-2xl $spacing-3xl $spacing-3xl;
-    position: relative;
-    z-index: 10;
+.hero-card {
+    position: absolute;
+    background: rgba(20, 20, 40, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: $radius-lg;
+    box-shadow: $shadow-lg;
 
-    .feature-card {
-        @include glass-card;
+    &--main {
+        width: 260px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        overflow: hidden;
+        animation: float 5s ease-in-out infinite;
+
+        .hcard-image {
+            height: 160px;
+            background: linear-gradient(135deg, $dark-600, $dark-500);
+            position: relative;
+
+            &::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(
+                    135deg,
+                    rgba(99, 102, 241, 0.3) 0%,
+                    rgba(245, 158, 11, 0.2) 100%
+                );
+            }
+        }
+
+        .hcard-content {
+            padding: $spacing-md;
+
+            .hcard-tag {
+                display: inline-block;
+                padding: 2px 8px;
+                background: rgba(245, 158, 11, 0.15);
+                border: 1px solid rgba(245, 158, 11, 0.3);
+                border-radius: $radius-full;
+                font-size: 0.7rem;
+                color: $accent;
+                font-weight: 600;
+                margin-bottom: $spacing-xs;
+            }
+
+            .hcard-name {
+                font-weight: 600;
+                font-size: 0.95rem;
+                margin-bottom: $spacing-sm;
+            }
+
+            .hcard-price {
+                display: flex;
+                align-items: center;
+                gap: $spacing-sm;
+
+                .hcard-current {
+                    font-weight: 700;
+                    font-size: 1.1rem;
+                    @include gradient-text;
+                }
+
+                .hcard-old {
+                    font-size: 0.8rem;
+                    color: $gray-300;
+                    text-decoration: line-through;
+                }
+            }
+        }
+    }
+
+    &--sm {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        padding: $spacing-sm $spacing-md;
+        min-width: 170px;
+
+        &.hero-card--top {
+            top: 80px;
+            right: 0;
+            animation: float 4s ease-in-out infinite;
+            animation-delay: -2s;
+        }
+
+        &.hero-card--bottom {
+            bottom: 80px;
+            left: 0;
+            animation: float 4.5s ease-in-out infinite;
+            animation-delay: -1s;
+        }
+
+        .hcard-sm-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: $radius-sm;
+            background: rgba(99, 102, 241, 0.15);
+            @include flex-center;
+            color: $primary-light;
+            flex-shrink: 0;
+
+            &--green {
+                background: rgba(16, 185, 129, 0.15);
+                color: $success;
+            }
+        }
+
+        .hcard-sm-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .hcard-sm-sub {
+            font-size: 0.72rem;
+            color: $gray-300;
+        }
+    }
+}
+
+// ── Stats ─────────────────────────────────────────────────
+.home-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    background: $dark-800;
+
+    .stat-item {
         padding: $spacing-xl;
         text-align: center;
-        transition: all $transition-base;
-        animation: fadeIn 0.6s ease calc(1s + var(--i, 0) * 0.15s) both;
+        border-right: 1px solid rgba(255,255,255,0.04);
+        transition: background $transition-base;
 
-        &:hover {
-            transform: translateY(-4px);
-            border-color: rgba(108, 92, 231, 0.4);
-            box-shadow: $shadow-glow;
+        &:last-child { border-right: none; }
+
+        &:hover { background: $dark-700; }
+
+        .stat-value {
+            font-family: $font-display;
+            font-size: 2rem;
+            font-weight: 800;
+            @include gradient-text;
+            margin-bottom: 4px;
         }
 
-        .feature-icon {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto $spacing-md;
-            border-radius: $radius-md;
-            @include flex-center;
-            font-size: 1.5rem;
-
-            &.icon-1 {
-                background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(108, 92, 231, 0.05));
-            }
-
-            &.icon-2 {
-                background: linear-gradient(135deg, rgba(0, 206, 201, 0.2), rgba(0, 206, 201, 0.05));
-            }
-
-            &.icon-3 {
-                background: linear-gradient(135deg, rgba(253, 121, 168, 0.2), rgba(253, 121, 168, 0.05));
-            }
-        }
-
-        h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: $spacing-sm;
-        }
-
-        p {
+        .stat-label {
+            font-size: 0.82rem;
             color: $gray-300;
-            font-size: 0.9rem;
+            font-weight: 500;
         }
     }
 
     @include responsive($breakpoint-md) {
-        grid-template-columns: 1fr;
-        padding: $spacing-lg;
+        grid-template-columns: repeat(2, 1fr);
+
+        .stat-item:nth-child(2) { border-right: none; }
+        .stat-item:nth-child(3) { border-top: 1px solid rgba(255,255,255,0.04); }
+        .stat-item:nth-child(4) { border-top: 1px solid rgba(255,255,255,0.04); }
+    }
+
+    @include responsive($breakpoint-sm) {
+        grid-template-columns: repeat(2, 1fr);
+
+        .stat-value { font-size: 1.5rem; }
+    }
+}
+
+// ── Section Header ─────────────────────────────────────────
+.section-header {
+    text-align: center;
+    margin-bottom: $spacing-2xl;
+
+    h3 {
+        font-family: $font-display;
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: $pure-white;
+        margin-bottom: $spacing-sm;
+    }
+
+    p {
+        color: $gray-200;
+        font-size: 1rem;
+    }
+}
+
+// ── Features ─────────────────────────────────────────────
+.home-features {
+    padding: $spacing-3xl;
+
+    @include responsive($breakpoint-sm) { padding: $spacing-2xl $spacing-lg; }
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-lg;
+
+    @include responsive($breakpoint-lg) { grid-template-columns: repeat(2, 1fr); }
+    @include responsive($breakpoint-sm) { grid-template-columns: 1fr; }
+}
+
+.feature-card {
+    @include surface-card;
+    padding: $spacing-xl;
+    transition: all $transition-base;
+    animation: fadeIn 0.5s ease calc(var(--i, 0) * 0.1s) both;
+
+    &:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255,255,255,0.1);
+        box-shadow: $shadow-md;
+    }
+
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: $radius-md;
+        @include flex-center;
+        margin-bottom: $spacing-md;
+    }
+
+    h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: $pure-white;
+        margin-bottom: $spacing-xs;
+    }
+
+    p {
+        color: $gray-200;
+        font-size: 0.88rem;
+        line-height: 1.6;
+    }
+
+    &--indigo .feature-icon {
+        background: rgba(99, 102, 241, 0.12);
+        color: $primary-light;
+    }
+
+    &--emerald .feature-icon {
+        background: rgba(16, 185, 129, 0.12);
+        color: $success;
+    }
+
+    &--amber .feature-icon {
+        background: rgba(245, 158, 11, 0.12);
+        color: $accent;
+    }
+
+    &--cyan .feature-icon {
+        background: rgba(6, 182, 212, 0.12);
+        color: $info;
+    }
+}
+
+// ── Categories ────────────────────────────────────────────
+.home-categories {
+    padding: 0 $spacing-3xl $spacing-3xl;
+
+    @include responsive($breakpoint-sm) {
+        padding: 0 $spacing-lg $spacing-2xl;
+    }
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: $spacing-md;
+
+    @include responsive($breakpoint-lg) { grid-template-columns: repeat(3, 1fr); }
+    @include responsive($breakpoint-sm) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.category-card {
+    @include surface-card;
+    padding: $spacing-lg $spacing-md;
+    text-align: center;
+    text-decoration: none;
+    transition: all $transition-base;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-sm;
+
+    &:hover {
+        transform: translateY(-3px);
+        border-color: rgba(99, 102, 241, 0.3);
+        box-shadow: $shadow-glow;
+    }
+
+    .category-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: $radius-md;
+        @include flex-center;
+        font-size: 1.5rem;
+        margin-bottom: 4px;
+    }
+
+    .category-name {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: $gray-100;
+    }
+}
+
+// ── CTA ───────────────────────────────────────────────────
+.home-cta {
+    margin: 0 $spacing-3xl $spacing-3xl;
+    border-radius: $radius-xl;
+    padding: $spacing-3xl;
+    background: linear-gradient(135deg, $dark-700 0%, $dark-600 100%);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+
+    @include responsive($breakpoint-sm) {
+        margin: 0 $spacing-lg $spacing-2xl;
+        padding: $spacing-2xl $spacing-lg;
+    }
+
+    .cta-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        pointer-events: none;
+
+        &--1 {
+            width: 300px; height: 300px;
+            background: rgba(99, 102, 241, 0.15);
+            top: -100px; left: -100px;
+        }
+
+        &--2 {
+            width: 200px; height: 200px;
+            background: rgba(245, 158, 11, 0.1);
+            bottom: -60px; right: -60px;
+        }
+    }
+
+    .cta-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .cta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-xs;
+        padding: 4px $spacing-md;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        border-radius: $radius-full;
+        font-size: 0.78rem;
+        color: $primary-light;
+        font-weight: 500;
+        margin-bottom: $spacing-lg;
+    }
+
+    h3 {
+        font-family: $font-display;
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: $pure-white;
+        margin-bottom: $spacing-sm;
+    }
+
+    p {
+        color: $gray-200;
+        font-size: 1rem;
+        margin-bottom: $spacing-2xl;
+    }
+
+    .cta-actions {
+        display: flex;
+        gap: $spacing-md;
+        justify-content: center;
+        flex-wrap: wrap;
+
+        .btn-cta-primary {
+            @include button-accent;
+            padding: 14px $spacing-2xl;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-cta-ghost {
+            @include button-ghost;
+            padding: 14px $spacing-xl;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+    }
+}
+
+// ── Footer ────────────────────────────────────────────────
+.home-footer {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: $spacing-2xl $spacing-3xl;
+    background: $dark-800;
+
+    @include responsive($breakpoint-sm) { padding: $spacing-xl $spacing-lg; }
+
+    .footer-brand {
+        margin-bottom: $spacing-xl;
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
+            margin-bottom: $spacing-sm;
+
+            .brand-icon--sm {
+                width: 30px;
+                height: 30px;
+                background: $primary;
+                border-radius: 6px;
+                @include flex-center;
+                color: $pure-white;
+            }
+
+            span {
+                font-family: $font-display;
+                font-size: 1.1rem;
+                font-weight: 700;
+                @include gradient-text;
+            }
+        }
+
+        p {
+            font-size: 0.85rem;
+            color: $gray-300;
+        }
+    }
+
+    .footer-links {
+        display: flex;
+        gap: $spacing-3xl;
+        margin-bottom: $spacing-2xl;
+
+        @include responsive($breakpoint-sm) {
+            gap: $spacing-xl;
+            flex-wrap: wrap;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: $spacing-sm;
+
+            h5 {
+                font-size: 0.82rem;
+                font-weight: 700;
+                color: $gray-100;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                margin-bottom: 4px;
+            }
+
+            a {
+                font-size: 0.85rem;
+                color: $gray-300;
+                text-decoration: none;
+                transition: color $transition-fast;
+
+                &:hover { color: $primary-light; }
+            }
+        }
+    }
+
+    .footer-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: $spacing-md;
+        padding-top: $spacing-lg;
+        border-top: 1px solid rgba(255,255,255,0.04);
+        font-size: 0.8rem;
+        color: $gray-300;
+
+        .footer-badges {
+            display: flex;
+            gap: $spacing-sm;
+
+            .footer-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                padding: 3px $spacing-sm;
+                background: rgba(255,255,255,0.04);
+                border-radius: $radius-full;
+                font-size: 0.75rem;
+            }
+        }
     }
 }

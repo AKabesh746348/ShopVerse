@@ -4,6 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts, fetchCategories, setCategoryFilter, setSearchQuery } from "../redux/actions/productActions";
 import { addToCart, fetchCart } from "../redux/actions/cartActions";
 import { logout } from "../redux/actions/authActions";
+import {
+    ShoppingBagIcon, ShoppingCartIcon, SearchIcon,
+    LogOutIcon, PackageIcon, StarIcon, HeartIcon
+} from "../components/Icons";
 import "../styles/pages/Landing.scss";
 
 const LandingPage = () => {
@@ -30,9 +34,7 @@ const LandingPage = () => {
     }, [dispatch, searchInput]);
 
     const handleSearchKeyDown = (e) => {
-        if (e.key === "Enter") {
-            handleSearch();
-        }
+        if (e.key === "Enter") handleSearch();
     };
 
     const handleAddToCart = async (productId) => {
@@ -55,96 +57,141 @@ const LandingPage = () => {
             {/* Navbar */}
             <nav className="landing-navbar">
                 <Link to="/shop" className="nav-brand">
-                    <div className="brand-icon">🛍️</div>
+                    <div className="brand-icon">
+                        <ShoppingBagIcon size={20} />
+                    </div>
                     <span>ShopVerse</span>
                 </Link>
 
                 <div className="nav-search">
-                    <span className="search-icon">🔍</span>
+                    <SearchIcon size={16} className="search-icon" />
                     <input
                         type="text"
-                        placeholder="Search products..."
+                        placeholder="Search for products, brands..."
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                         onKeyDown={handleSearchKeyDown}
                     />
+                    <button className="search-btn" onClick={handleSearch}>Search</button>
                 </div>
 
                 <div className="nav-actions">
                     <div className="nav-user">
                         <div className="user-avatar">{userInitial}</div>
-                        <span className="user-name">{user?.name || "Guest"}</span>
+                        <div className="user-info">
+                            <span className="user-greeting">Hello,</span>
+                            <span className="user-name">{user?.name || "Guest"}</span>
+                        </div>
                     </div>
 
                     <Link to="/cart" className="nav-cart">
-                        <span className="cart-icon">🛒</span>
+                        <ShoppingCartIcon size={20} />
                         {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
-                        <span className="cart-total">₹{cartTotal.toFixed(2)}</span>
+                        <div className="cart-info">
+                            <span className="cart-label">Cart</span>
+                            <span className="cart-total">₹{cartTotal.toFixed(0)}</span>
+                        </div>
                     </Link>
 
-                    <button className="btn-logout" onClick={handleLogout}>
-                        Logout
+                    <button className="btn-logout" onClick={handleLogout} title="Logout">
+                        <LogOutIcon size={16} />
+                        <span>Logout</span>
                     </button>
                 </div>
             </nav>
 
-            {/* Category Filter */}
+            {/* Category Bar */}
             {categories.length > 0 && (
                 <div className="category-bar">
-                    {categories.map((cat) => (
-                        <button
-                            key={cat}
-                            className={`category-chip ${selectedCategory === cat ? "active" : ""}`}
-                            onClick={() => handleCategoryChange(cat)}
-                        >
-                            {cat}
-                        </button>
-                    ))}
+                    <div className="category-bar-inner">
+                        {categories.map((cat) => (
+                            <button
+                                key={cat}
+                                className={`category-chip ${selectedCategory === cat ? "active" : ""}`}
+                                onClick={() => handleCategoryChange(cat)}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
 
             {/* Products */}
             <section className="products-section">
                 <div className="products-header">
-                    <h2>
-                        {selectedCategory === "All" ? "All Products" : selectedCategory}
-                    </h2>
-                    <span className="products-count">{products.length} products</span>
+                    <div className="products-title">
+                        <h2>{selectedCategory === "All" ? "All Products" : selectedCategory}</h2>
+                        <span className="products-count">{products.length} products</span>
+                    </div>
                 </div>
 
                 <div className="products-grid">
                     {loading ? (
-                        <div className="products-loading">
-                            <div className="loading-spinner"></div>
-                            Loading amazing products...
-                        </div>
+                        Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className="product-skeleton">
+                                <div className="skeleton-image" />
+                                <div className="skeleton-body">
+                                    <div className="skeleton-line skeleton-line--wide" />
+                                    <div className="skeleton-line skeleton-line--medium" />
+                                    <div className="skeleton-line skeleton-line--short" />
+                                </div>
+                            </div>
+                        ))
                     ) : products.length === 0 ? (
                         <div className="no-products">
-                            <div className="empty-icon">📦</div>
-                            <p>No products found. Try a different search or category.</p>
+                            <PackageIcon size={48} className="empty-icon" />
+                            <h3>No products found</h3>
+                            <p>Try a different search term or browse all categories.</p>
+                            <button
+                                className="btn-reset"
+                                onClick={() => {
+                                    dispatch(setCategoryFilter("All"));
+                                    dispatch(setSearchQuery(""));
+                                    setSearchInput("");
+                                }}
+                            >
+                                Clear filters
+                            </button>
                         </div>
                     ) : (
                         products.map((product) => (
-                            <div key={product._id} className={`product-card ${addedProduct === product._id ? "added-flash" : ""}`}>
+                            <div
+                                key={product._id}
+                                className={`product-card ${addedProduct === product._id ? "added-flash" : ""}`}
+                            >
                                 <div className="product-image">
-                                    <img src={product.image} alt={product.name} />
-                                    <span className="product-category">{product.category}</span>
-                                    {product.rating && (
-                                        <span className="product-rating">
-                                            <span className="star">★</span> {product.rating}
-                                        </span>
-                                    )}
+                                    <img src={product.image} alt={product.name} loading="lazy" />
+                                    <span className="product-category-badge">{product.category}</span>
+                                    <button className="product-wishlist" aria-label="Add to wishlist">
+                                        <HeartIcon size={16} />
+                                    </button>
+                                    <div className="product-overlay">
+                                        <button
+                                            className="btn-quick-add"
+                                            onClick={() => handleAddToCart(product._id)}
+                                        >
+                                            <ShoppingCartIcon size={16} />
+                                            {addedProduct === product._id ? "Added!" : "Add to Cart"}
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="product-info">
+                                    {product.rating && (
+                                        <div className="product-rating">
+                                            <StarIcon size={12} className="star" />
+                                            <span>{product.rating}</span>
+                                        </div>
+                                    )}
                                     <h3 className="product-name">{product.name}</h3>
                                     <p className="product-desc">{product.description}</p>
                                     <div className="product-footer">
-                                        <span className="product-price">₹{product.price.toFixed(2)}</span>
+                                        <span className="product-price">₹{product.price.toFixed(0)}</span>
                                         <button
-                                            className="btn-add-cart"
+                                            className={`btn-add-cart ${addedProduct === product._id ? "added" : ""}`}
                                             onClick={() => handleAddToCart(product._id)}
                                         >
-                                            <span className="cart-icon">🛒</span> Add
+                                            {addedProduct === product._id ? "Added!" : "Add to Cart"}
                                         </button>
                                     </div>
                                 </div>
@@ -153,6 +200,26 @@ const LandingPage = () => {
                     )}
                 </div>
             </section>
+
+            {/* Footer */}
+            <footer className="landing-footer">
+                <div className="landing-footer-inner">
+                    <div className="lf-brand">
+                        <div className="brand-icon">
+                            <ShoppingBagIcon size={16} />
+                        </div>
+                        <span>ShopVerse</span>
+                    </div>
+                    <div className="lf-links">
+                        <a href="#about">About</a>
+                        <a href="#help">Help</a>
+                        <a href="#returns">Returns</a>
+                        <a href="#privacy">Privacy</a>
+                        <a href="#terms">Terms</a>
+                    </div>
+                    <span className="lf-copy">© {new Date().getFullYear()} ShopVerse</span>
+                </div>
+            </footer>
         </div>
     );
 };

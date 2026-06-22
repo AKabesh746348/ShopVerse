@@ -1,41 +1,24 @@
 @use '../variables' as *;
 
+// ============================================
+// Auth Pages (Login / Signup)
+// ============================================
+
 .auth-page {
     min-height: 100vh;
     display: flex;
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-        content: '';
-        position: absolute;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(108, 92, 231, 0.15) 0%, transparent 70%);
-        top: -200px;
-        right: -200px;
-        z-index: 0;
-    }
-
-    &::after {
-        content: '';
-        position: absolute;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(253, 121, 168, 0.08) 0%, transparent 70%);
-        bottom: -150px;
-        left: -150px;
-        z-index: 0;
-    }
+    background: $dark-900;
 }
 
+// ── Left Panel ────────────────────────────────────────────
 .auth-left {
     flex: 1;
+    max-width: 520px;
     @include flex-center;
     flex-direction: column;
-    padding: $spacing-3xl;
+    padding: $spacing-3xl $spacing-2xl;
     position: relative;
-    z-index: 10;
+    border-right: 1px solid rgba(255,255,255,0.04);
 
     .auth-back-link {
         position: absolute;
@@ -45,21 +28,30 @@
         align-items: center;
         gap: $spacing-sm;
         color: $gray-300;
-        font-size: 0.9rem;
-        transition: color $transition-base;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: color $transition-fast;
         cursor: pointer;
         text-decoration: none;
 
-        &:hover {
-            color: $primary-light;
-        }
+        &:hover { color: $primary-light; }
+    }
+
+    @include responsive($breakpoint-lg) {
+        max-width: none;
+        border-right: none;
+        padding: $spacing-2xl $spacing-xl;
+    }
+
+    @include responsive($breakpoint-sm) {
+        padding: $spacing-xl $spacing-md;
     }
 }
 
 .auth-card {
     width: 100%;
-    max-width: 440px;
-    animation: fadeIn 0.5s ease;
+    max-width: 420px;
+    animation: fadeIn 0.45s ease both;
 
     .auth-header {
         text-align: center;
@@ -70,20 +62,20 @@
             align-items: center;
             justify-content: center;
             gap: $spacing-sm;
-            margin-bottom: $spacing-xl;
+            margin-bottom: $spacing-lg;
 
             .logo-icon {
-                width: 44px;
-                height: 44px;
-                background: linear-gradient(135deg, $primary, $accent);
-                border-radius: $radius-md;
+                width: 42px;
+                height: 42px;
+                background: $primary;
+                border-radius: $radius-sm;
                 @include flex-center;
-                font-size: 1.4rem;
+                color: $pure-white;
             }
 
             span {
                 font-family: $font-display;
-                font-size: 1.4rem;
+                font-size: 1.3rem;
                 font-weight: 700;
                 @include gradient-text;
             }
@@ -91,14 +83,15 @@
 
         h2 {
             font-family: $font-display;
-            font-size: 1.8rem;
+            font-size: 1.75rem;
             font-weight: 700;
-            margin-bottom: $spacing-sm;
+            color: $pure-white;
+            margin-bottom: $spacing-xs;
         }
 
         p {
             color: $gray-300;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
     }
 
@@ -110,12 +103,13 @@
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: $spacing-xs;
+            gap: 6px;
 
             label {
-                font-size: 0.85rem;
-                font-weight: 500;
+                font-size: 0.82rem;
+                font-weight: 600;
                 color: $gray-200;
+                letter-spacing: 0.01em;
             }
 
             .input-wrapper {
@@ -127,9 +121,8 @@
                     top: 50%;
                     transform: translateY(-50%);
                     color: $gray-300;
-                    font-size: 1.1rem;
+                    display: flex;
                     pointer-events: none;
-                    /* Ensure clicks go through if necessary, though it's on the left */
                 }
 
                 .password-toggle {
@@ -139,65 +132,72 @@
                     transform: translateY(-50%);
                     color: $gray-300;
                     cursor: pointer;
-                    font-size: 1.0rem;
-                    transition: color 0.2s ease;
                     background: none;
                     border: none;
                     padding: 0;
                     display: flex;
-                    /* Centers the icon */
+                    align-items: center;
+                    transition: color $transition-fast;
 
-                    &:hover {
-                        color: $primary-light;
-                    }
+                    &:hover { color: $primary-light; }
                 }
 
                 input {
                     @include input-field;
                     padding-left: 44px;
                     padding-right: 44px;
-                    /* Make space for the toggle on the right */
                 }
             }
         }
 
         .auth-error {
-            background: rgba(225, 112, 85, 0.1);
-            border: 1px solid rgba(225, 112, 85, 0.3);
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
             border-radius: $radius-sm;
             padding: $spacing-sm $spacing-md;
             color: $danger;
-            font-size: 0.85rem;
-            animation: scaleIn 0.3s ease;
+            font-size: 0.83rem;
+            animation: scaleIn 0.25s ease;
         }
 
         .btn-auth {
-            @include button-primary;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: $spacing-xs;
+            @include button-accent;
             width: 100%;
-            padding: $spacing-md;
-            font-size: 1rem;
-            margin-top: $spacing-sm;
+            padding: 14px;
+            font-size: 0.95rem;
+            margin-top: 4px;
 
             &.loading {
                 pointer-events: none;
                 opacity: 0.8;
+            }
 
-                .spinner {
-                    display: inline-block;
-                    width: 18px;
-                    height: 18px;
-                    border: 2px solid rgba(255, 255, 255, 0.3);
-                    border-top-color: $pure-white;
-                    border-radius: 50%;
-                    animation: spin 0.6s linear infinite;
-                    margin-right: $spacing-sm;
+            .spinner {
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                border: 2px solid rgba(8, 8, 15, 0.3);
+                border-top-color: $dark-900;
+                border-radius: 50%;
+                animation: spin 0.6s linear infinite;
+            }
+        }
 
-                    @keyframes spin {
-                        to {
-                            transform: rotate(360deg);
-                        }
-                    }
-                }
+        .auth-terms {
+            text-align: center;
+            color: $gray-300;
+            font-size: 0.75rem;
+            margin-top: -$spacing-xs;
+
+            a {
+                color: $primary-light;
+                text-decoration: none;
+
+                &:hover { text-decoration: underline; }
             }
         }
 
@@ -205,128 +205,131 @@
             display: flex;
             align-items: center;
             gap: $spacing-md;
-            margin: $spacing-sm 0;
+            margin: 4px 0;
 
             &::before,
             &::after {
                 content: '';
                 flex: 1;
                 height: 1px;
-                background: $dark-500;
+                background: rgba(255,255,255,0.07);
             }
 
             span {
                 color: $gray-300;
-                font-size: 0.8rem;
+                font-size: 0.75rem;
                 text-transform: uppercase;
-                letter-spacing: 1px;
+                letter-spacing: 0.08em;
             }
         }
 
         .auth-switch {
             text-align: center;
             color: $gray-300;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
 
             a {
                 color: $primary-light;
                 font-weight: 600;
-                transition: color $transition-base;
+                text-decoration: none;
+                transition: color $transition-fast;
 
-                &:hover {
-                    color: $primary;
-                }
+                &:hover { color: $primary; }
             }
         }
     }
 }
 
+// ── Right Panel ───────────────────────────────────────────
 .auth-right {
     flex: 1;
     @include flex-center;
+    background: $dark-800;
     position: relative;
-    background: linear-gradient(135deg, rgba(108, 92, 231, 0.05), rgba(253, 121, 168, 0.05));
     overflow: hidden;
 
-    .auth-illustration {
-        text-align: center;
-        padding: $spacing-3xl;
-        animation: fadeIn 0.6s ease 0.3s both;
-        z-index: 10;
+    @include responsive($breakpoint-lg) { display: none; }
+}
 
-        .illustration-graphic {
-            width: 300px;
-            height: 300px;
-            margin: 0 auto $spacing-xl;
-            position: relative;
+.auth-visual {
+    position: relative;
+    z-index: 2;
+    padding: $spacing-3xl;
+    @include flex-center;
 
-            .circle-outer {
-                width: 100%;
-                height: 100%;
-                border: 2px solid rgba(108, 92, 231, 0.2);
-                border-radius: 50%;
-                @include flex-center;
-                animation: float 6s ease-in-out infinite;
+    .av-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
 
-                .circle-inner {
-                    width: 200px;
-                    height: 200px;
-                    border: 2px solid rgba(253, 121, 168, 0.2);
-                    border-radius: 50%;
-                    @include flex-center;
-
-                    .center-icon {
-                        font-size: 4rem;
-                        animation: pulse 3s ease-in-out infinite;
-                    }
-                }
-            }
-
-            .floating-dot {
-                position: absolute;
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                animation: float 4s ease-in-out infinite;
-
-                &:nth-child(2) {
-                    background: $primary;
-                    top: 20px;
-                    left: 60px;
-                    animation-delay: -1s;
-                }
-
-                &:nth-child(3) {
-                    background: $accent;
-                    top: 40px;
-                    right: 40px;
-                    animation-delay: -2s;
-                }
-
-                &:nth-child(4) {
-                    background: $secondary;
-                    bottom: 60px;
-                    left: 30px;
-                    animation-delay: -3s;
-                }
-            }
+        &--1 {
+            width: 400px; height: 400px;
+            background: rgba(99, 102, 241, 0.15);
+            top: -100px; right: -100px;
         }
 
-        h3 {
-            font-family: $font-display;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: $spacing-sm;
+        &--2 {
+            width: 280px; height: 280px;
+            background: rgba(245, 158, 11, 0.08);
+            bottom: -80px; left: -80px;
         }
+    }
+}
 
-        p {
-            color: $gray-300;
-            max-width: 360px;
-            font-size: 0.95rem;
+.av-card {
+    background: rgba(20, 20, 40, 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: $radius-xl;
+    padding: $spacing-2xl;
+    max-width: 380px;
+    animation: scaleIn 0.5s ease 0.2s both;
+
+    .av-icon {
+        width: 68px;
+        height: 68px;
+        background: rgba(99, 102, 241, 0.12);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: $radius-lg;
+        @include flex-center;
+        color: $primary-light;
+        margin-bottom: $spacing-lg;
+        animation: float 5s ease-in-out infinite;
+
+        &--accent {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.2);
+            color: $accent;
         }
     }
 
-    @include responsive($breakpoint-lg) {
-        display: none;
+    h3 {
+        font-family: $font-display;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: $pure-white;
+        margin-bottom: $spacing-sm;
+    }
+
+    p {
+        color: $gray-200;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: $spacing-lg;
+    }
+
+    .av-bullets {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+
+        li {
+            font-size: 0.85rem;
+            color: $gray-100;
+            font-weight: 500;
+        }
     }
 }
